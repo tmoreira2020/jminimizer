@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE configuration SYSTEM "../../../resources/configuration.dtd" >
+<configuration>
+	<inspect>
+	</inspect>
+	<notInspect>
+		<pattern>org*</pattern>
+		<pattern>java*</pattern>
+	</notInspect>
+</configuration>
