@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT configuration (programClasspath,runtimeClasspath?,inspect, excludeResources?, notInspect?, output?, report?)>
+<!ELEMENT configuration (programClasspath,runtimeClasspath?,((inspect, preserve)|inspect|preserve), excludeResources?, notInspect?, output?, report?)>
 <!ATTLIST configuration deepStripment (true|false) #IMPLIED>
 
 <!ELEMENT programClasspath (url*, directory*, fileset*)>
@@ -18,6 +18,8 @@
 <!ATTLIST file name CDATA #REQUIRED>
 
 <!ELEMENT inspect (class*)>
+
+<!ELEMENT preserve (class*)>
 
 <!ELEMENT class (constructor*,method*)>
 <!ATTLIST class name NMTOKEN #REQUIRED>
