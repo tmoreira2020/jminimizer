@@ -9,7 +9,6 @@ import org.apache.bcel.generic.Type;
  *  
  */
 public class Method extends FieldOrMethod {
-	
 	private MethodGen method;
 	/**
 	 *  
@@ -39,33 +38,26 @@ public class Method extends FieldOrMethod {
 	/**
 	 *  
 	 */
-	private boolean inSubClasses;
-	/**
-	 *  
-	 */
-	public Method(String className, String name,
-			String[] argumentClasses, String returnClass,
-			boolean inSubClasses) {
-	    this(className, name, Utility.methodTypeToSignature(returnClass, argumentClasses), inSubClasses);
+	public Method(String className, String name, String[] argumentClasses,
+			String returnClass) {
+		this(className, name, Utility.methodTypeToSignature(returnClass,
+				argumentClasses));
 	}
 	/**
 	 *  
 	 */
 	public Method(MethodGen method) {
-		this(method.getClassName(), method.getName(), method.getSignature(),
-				false);
-		this.method= method;
+		this(method.getClassName(), method.getName(), method.getSignature());
+		this.method = method;
 	}
 	/**
 	 *  
 	 */
-	public Method(String className, String name, String signature,
-			boolean inSubClasses) {
+	public Method(String className, String name, String signature) {
 		super();
 		this.setClassName(className);
 		this.setName(name);
 		this.setSignature(signature);
-		this.inSubClasses = inSubClasses;
 	}
 	/**
 	 *  
@@ -77,17 +69,12 @@ public class Method extends FieldOrMethod {
 		return buffer.toString();
 	}
 	/**
-	 * @return Returns the inSubClasses.
-	 */
-	public boolean isInSubClasses() {
-		return this.inSubClasses;
-	}
-	/**
 	 *  
 	 */
 	public org.apache.bcel.classfile.Method toClassFileMethod()
 			throws ClassNotFoundException {
 		ClassGen clazz = new ClassGen(Repository.lookupClass(className));
+		//TODO lancar execeção que não achou o metodo
 		return clazz.containsMethod(name, signature);
 	}
 	/**
@@ -96,7 +83,7 @@ public class Method extends FieldOrMethod {
 	public MethodGen toMethodGen() throws ClassNotFoundException {
 		if (method == null) {
 			ClassGen clazz = new ClassGen(Repository.lookupClass(className));
-			method= new MethodGen(this.toClassFileMethod(), className, clazz
+			method = new MethodGen(this.toClassFileMethod(), className, clazz
 					.getConstantPool());
 		}
 		return method;

@@ -15,15 +15,18 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 /**
  * @author Thiago Leão Moreira
  * @since Apr 18, 2004
  *  
  */
 public class JMinimizer {
-	private static final Log log = LogFactory.getLog(JMinimizer.class);
+	
+	/**
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */	
 	public static void main(String[] args) throws Exception{
 	    CommandLineParser parser= new BasicParser();
 	    CommandLine cl= null;;
@@ -34,7 +37,6 @@ public class JMinimizer {
             hf.printHelp("net.java.dev.jminimizer.JMinimizer", getOptions());
             System.exit(0);
         }
-        System.out.println(cl.getArgs().length);
         String[] paths= cl.getOptionValues('p');
 		URL[] program= new URL[paths.length];
         for (int i = 0; i < paths.length; i++) {
@@ -57,21 +59,30 @@ public class JMinimizer {
 			output= (File)cl.getOptionObject('o');
 		}
 		System.out.println("Transforming...");
-		an.visit(new Transformer(repo, output));
-		
+		an.visit(new Transformer(mi, repo, output));
 	}
 	
+	/**
+	 * 
+	 * @param path
+	 * @return
+	 * @throws MalformedURLException
+	 */
 	private static URL convertToURL(String path) throws MalformedURLException {
 	    File file= new File(path);
 		URL url= null;
 		if (file.isDirectory()) {
-			url= file.toURL();
+			url = file.toURL();
 		} else if (path.endsWith("jar") || path.endsWith("zip")) {
-			url= new URL("jar:"+file.toURL()+"!/");
+			url = new URL("jar:" + file.toURL() + "!/");
 		}
 		return url;
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 */	
 	private static Options getOptions() {
 	    Options opts= new Options();
 	    //output option

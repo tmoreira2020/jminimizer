@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT arguments (classType?,primitiveType?)*>
+<!ELEMENT class (constructor*,method*)>
+<!ATTLIST class 
+	name NMTOKEN #REQUIRED
+	knowTime (runtime|compiletime) #REQUIRED>
+<!ELEMENT classType EMPTY>
+<!ATTLIST classType name CDATA #REQUIRED>
+<!ELEMENT configuration (inspect,notInspect?,notRemove?)>
+<!ELEMENT constructor (arguments)>
+<!ELEMENT inspect (class*)>
+<!ELEMENT method (arguments,return)>
+<!ATTLIST method name CDATA #REQUIRED>
+<!ELEMENT notInspect (pattern*)>
+<!ELEMENT notRemove (pattern*)>
+<!ELEMENT pattern (#PCDATA)>
+<!ELEMENT primitiveType EMPTY>
+<!ATTLIST primitiveType name (byte|char|int|float|long|double) #REQUIRED>
+<!ELEMENT return (classType|primitiveType|void)>
+<!ELEMENT void EMPTY>

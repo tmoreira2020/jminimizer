@@ -12,14 +12,14 @@ public class Constructor extends Method {
 	 */
 	public Constructor(String className,
 			String[] argumentClasses) {
-		super(className, "<init>", argumentClasses, "void", false);
+		super(className, "<init>", argumentClasses, "void");
 	}
 	/**
 	 * @param className
 	 * @param signature
 	 */
 	public Constructor(String className, String signature) {
-		super(className, "<init>", signature, false);
+		super(className, "<init>", signature);
 	}
 	/**
 	 * @see java.lang.Object#toString()

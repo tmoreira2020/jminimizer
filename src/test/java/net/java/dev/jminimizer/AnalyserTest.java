@@ -46,10 +46,10 @@ public class AnalyserTest extends TestCase {
 	public void testGetLimitsMethods() throws Exception{
 		Analyser an = this.getAnalyser();
 		Set lm= an.getLimitsMethods();
-		assertEquals(3, lm.size());
-		Method m= new Method("dummy.Person", "getName", "()Ljava/lang/String;", false);
+		assertEquals(47, lm.size());
+		Method m= new Method("dummy.Person", "getName", "()Ljava/lang/String;");
 		assertTrue("Must contains: " + m + " method", lm.contains(m));
-		m= new Method("dummy.Person", "setName", "(Ljava/lang/String;)V", false);
+		m= new Method("dummy.Person", "setName", "(Ljava/lang/String;)V");
 		assertTrue("Must contains: " + m + " method", lm.contains(m));
 		m= new Constructor("java.lang.Object", "()V");
 		assertTrue("Must contains: " + m + " constructor", lm.contains(m));
@@ -65,7 +65,7 @@ public class AnalyserTest extends TestCase {
 			d.delete();
 		}
 		d.mkdirs();
-		an.visit(new Transformer(an.getRepository(), d));
+//		an.visit(new Transformer(an.getRepository(), d));
 	}
 	private Analyser getAnalyser() throws Exception {
 		URL[] program = new URL[]{new URL("file:target/test-classes/")};
