@@ -1,0 +1,39 @@
+\chapter{Introdução}
+
+Este trabalho consiste do estudo e desenvolvimento de uma aplicação capaz de analisar uma outra aplicação Java\cite{java} e apartir dessa analise transformar a aplicação, de forma que seu comportamante não se modifique, tentando reduzir o seu tamanho original.
+
+\section{Motivação}
+A popularidade da linguagem de programação Java\cite{java}, principalmente para pequenos dispositivos\cite{j2me} %COLOCAR AQUI INFO SOBRE A QTD DE CELULARES %
+ (celulares, PDA's \footnote{Personal Digital Assistant}, smart phones, etc), resultou num aumento significante de bibliotecas utilitárias e frameworks que facilitam e aumentam a produtividade no desenvolvimento de aplicações para esta linguagem. Tais bibliotecas e frameworks são utilizados como infra-estrutura na solução de problemas específicos.
+Bibliotecas para logging, manipulação de documentos XML, construção de interfaces gráficas, frameworks para desenvolvimento WEB, para persistência de dados, etc\ldots são algumas aplicações que estas bibliotecas de classes possuem. 
+Sites como http://ws.apache.org, http://java.net, http://jakarta.apache.org, http://www.sf.net são web sites especializados em abrigar projetos de frameworks e bibliotecas para a linguagem Java\cite{java}, neles são disponibilizados dezenas e até centenas de pequenos e grandes projetos destinados a facilitar o desenvolvimento de aplicações \cite{java}, sendo ela para qualquer uma das três plataformas: J2ME\footnote{Java 2 Micro Edition}, J2SE\footnote{Java 2 Standard Edition}, J2EE\footnote{Java 2 Enterprise Edition}. Poupando assim tempo e dinheiro de construir e depurar classes de infra-estrutura.
+No entanto a utilização de bibliotecas de terceiros pode acarretar num aumento do tamanho da aplicação se estas bibliotecas não tiverem disponíveis no ambiente de execução do aplicativo.
+Em conseqüência do aumento do tamanho da aplicação também aumentará o tempo para se realizar o download (se for esta a forma de distribuição do aplicativo) e aumentará o espaço necessário para acomodar a aplicação no dispositivo. Este último é de suma importância quando desenvolvemos aplicações para a plataforma J2ME\footnote{Java 2 Micro Edition}, onde os dispositivos alvos podem ter somente uma pequena quantidade de espaço para o armazenamento de aplicações.
+Isto exposto verificamos que a utilização de bibliotecas de terceiros pode resolver o problema de desenvolver e depurar classes para a infra-estrutura e criar outros problemas relacionados ao armazenamento e ao tempo de obtenção da aplicação. No entanto este segundo, parece ser de mais fácil solução. Uma primeira alternativa de solução para o problema seria aumentar a capacidade de armazenamento do aparelho/dispositivo ou adquirir um aparelho/dispositivo similar com maior capacidade de armazenamento. Mas se não for possível aumentar a capacidade de armazenamento, nem de trocar de aparelho/dispositivo a segunda solução seria tentar retirar do código gerado todo o tipo de informação e estrutura que não irá afetar a execução normal do aplicativo. E é nesta segunda solução que este trabalho de conclusão de curso é baseado.
+
+\section{Justificativa}
+
+\subsection{Científica}
+O desenvolvimento dessa dissertação contribuirá para a comunidade científica no esclarecimento da estrutura do \textit{bytecode} Java\cite{java} e quais dessas estruturas podem ser removidas.
+
+\subsection{Pessoal}
+A grande curiosidade que sempre tive em relação ao \textit{bytecode} Java\cite{java}, que é meu instrumento de trabalho, e a necessidade de desenvolver um trabalho de conclusão de curso para Universidade Federal de Santa Catarina me levaram a desenvolver essa dissertação.
+
+\subsection{Social}
+A possibilidade de desenvolver aplicações e compartilha-las com meus amigos, sempre foi algo que imaginei um dia fazer e a plataforma J2ME\cite{j2me}, me possibilitou realizar esse desejo. Por esse motivo desenvolvi o JMinimizer, para auxiliar desenvolvedores que como eu desejam distribuir suas aplicações entre seus amigos.
+
+\section{Objetivos}
+
+\subsection{Geral}
+Desenvolver uma ferramenta de desenvolvimento de aplicações Java\cite{java} que auxilie o \textit{deployment} dessas aplicações na maior quantidade de dispositivos quem suportam a plataforma J2ME\cite{j2me}
+\subsection{Específicos}
+Esse projeto apresenta os seguintes objetivos específicos.
+
+\begin{itemize}
+\item{Conhecimento}
+\begin{itemize}
+\item{Consolidar meus conhecimentos na técnologia Java\cite{java}.}
+\item{Aprender as etapas de desenvolvimento de uma aplicação open source.}
+\end{itemize}
+\item{Criar uma ferramenta capaz de diminuir o tamanho de uma aplicação Java\cite{java}}
+\end{itemize}
