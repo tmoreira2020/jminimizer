@@ -2,9 +2,6 @@ package dummy;
 
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * @author Thiago Leão Moreira
  * @since Apr 12, 2004
@@ -12,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class Person {
 
-	private static final Log log = LogFactory.getLog(Person.class);
+//	private static final Log log = LogFactory.getLog(Person.class);
 	private String name;
 
 	/**

@@ -17,7 +17,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import net.java.dev.jminimizer.beans.Field;
+
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
@@ -225,7 +227,7 @@ public class URLRepository implements Repository {
 		if (sjc != null) {
 			net.java.dev.jminimizer.beans.Class superClass = new net.java.dev.jminimizer.beans.Class(
 					sjc.getClassName());
-			clazz.setSuperClass(superClass);
+			clazz.addSuperClass(superClass);
 		}
 	}
 	/**

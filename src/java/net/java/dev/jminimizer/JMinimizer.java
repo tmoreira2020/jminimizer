@@ -2,6 +2,8 @@ package net.java.dev.jminimizer;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.java.dev.jminimizer.util.MethodInspector;
 import net.java.dev.jminimizer.util.Repository;
@@ -51,15 +53,23 @@ public class JMinimizer {
             }
         }
 		Repository repo= new URLRepository(program, runtime);
+//		JavaClass jc= repo.loadClass(JMinimizer.class);
+//		System.out.println(jc.getMethods()[1].getCode());
 		MethodInspector mi= new XMLMethodInspector((File)cl.getOptionObject('c'), repo);
 		System.out.println("Analysing...");
 		Analyser an= new Analyser(mi, repo);
+		Set methods= new HashSet();
+		an.analyse(mi.getMethodsToInspect(), methods);
+		System.out.println();
+//		System.out.println(methods);
+		System.out.println();
+
 	    File output= new File("output");
 		if (cl.hasOption('o')) {
 			output= (File)cl.getOptionObject('o');
 		}
 		System.out.println("Transforming...");
-		an.visit(new Transformer(mi, repo, output));
+		an.receiveVisitor(new Transformer(methods, mi, repo, output));
 	}
 	
 	/**

@@ -53,15 +53,6 @@ public class Method extends FieldOrMethod {
 	/**
 	 *  
 	 */
-	public Method(String className, String name, String signature) {
-		super();
-		this.setClassName(className);
-		this.setName(name);
-		this.setSignature(signature);
-	}
-	/**
-	 *  
-	 */
 	public String getNameAndSignature() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(this.getName());
@@ -83,8 +74,8 @@ public class Method extends FieldOrMethod {
 	public MethodGen toMethodGen() throws ClassNotFoundException {
 		if (method == null) {
 			ClassGen clazz = new ClassGen(Repository.lookupClass(className));
-			method = new MethodGen(this.toClassFileMethod(), className, clazz
-					.getConstantPool());
+				method = new MethodGen(this.toClassFileMethod(), className, clazz
+						.getConstantPool());
 		}
 		return method;
 	}
@@ -116,5 +107,14 @@ public class Method extends FieldOrMethod {
 		}
 		buffer.append(')');
 		return buffer.toString();
+	}
+	/**
+	 * @param className
+	 * @param name
+	 * @param signature
+	 */
+	public Method(String className, String name, String signature) {
+		super(className, name, signature);
+		// TODO Auto-generated constructor stub
 	}
 }

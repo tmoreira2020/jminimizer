@@ -15,6 +15,6 @@
 <!ELEMENT notRemove (pattern*)>
 <!ELEMENT pattern (#PCDATA)>
 <!ELEMENT primitiveType EMPTY>
-<!ATTLIST primitiveType name (byte|char|int|float|long|double) #REQUIRED>
+<!ATTLIST primitiveType name (boolean|byte|char|int|float|long|double) #REQUIRED>
 <!ELEMENT return (classType|primitiveType|void)>
 <!ELEMENT void EMPTY>

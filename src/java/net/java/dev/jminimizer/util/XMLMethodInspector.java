@@ -2,17 +2,18 @@ package net.java.dev.jminimizer.util;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
 import net.java.dev.jminimizer.beans.Class;
 import net.java.dev.jminimizer.beans.Constructor;
 import net.java.dev.jminimizer.beans.Method;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.regexp.RE;
@@ -27,12 +28,10 @@ import org.w3c.dom.NodeList;
 public class XMLMethodInspector implements MethodInspector {
 	private static final Log log = LogFactory.getLog(XMLMethodInspector.class);
 	protected Method[] methods;
-	protected Set methodsNoRemove;
+//	protected Set methodsNoRemove;
 	protected Map primitives;
 	protected RE reNotInspect;
-	protected RE reNotRemove;
 	protected Repository repository;
-	protected Set runtimeLoadedClass;
 	/**
 	 *  
 	 */
@@ -41,8 +40,8 @@ public class XMLMethodInspector implements MethodInspector {
 		super();
 		this.initPrimitives();
 		this.repository = repository;
-		runtimeLoadedClass = new HashSet();
-		methodsNoRemove = new HashSet();
+	//	runtimeLoadedClass = new HashSet();
+		//methodsNoRemove = new HashSet();
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
@@ -52,7 +51,7 @@ public class XMLMethodInspector implements MethodInspector {
 		Element root = document.getDocumentElement();
 		this.buildMethodsToInspect(root);
 		reNotInspect = this.buildPattern(root, "notInspect");
-		reNotRemove = this.buildPattern(root, "notRemove");
+		//reNotRemove = this.buildPattern(root, "notRemove");
 	}
 	/**
 	 * @param className
@@ -80,11 +79,6 @@ public class XMLMethodInspector implements MethodInspector {
 	 */
 	private Class buildClass(Element element) throws ClassNotFoundException {
 		Class clazz = new Class(element.getAttribute("name"));
-		String knowTime = element.getAttribute("knowTime");
-		if (knowTime != null && knowTime.equals("runtime")) {
-			log.debug("Building runtime loading class: " + clazz.getName());
-			runtimeLoadedClass.add(clazz);
-		}
 		NodeList constructorList = element.getElementsByTagName("constructor");
 		int n = constructorList.getLength();
 		for (int j = 0; j < n; j++) {
@@ -261,17 +255,12 @@ public class XMLMethodInspector implements MethodInspector {
 		}
 	}
 	/**
-	 * @see net.java.dev.jminimizer.util.MethodInspector#getRuntimeLoadedClass()
-	 */
-	public Class[] getRuntimeLoadedClass() {
-		return (Class[]) runtimeLoadedClass.toArray(new Class[0]);
-	}
-	/**
 	 * 
 	 *  
 	 */
 	private void initPrimitives() {
 		primitives = new HashMap();
+		primitives.put("boolean", Boolean.TYPE.getName());
 		primitives.put("byte", Byte.TYPE.getName());
 		primitives.put("short", Short.TYPE.getName());
 		primitives.put("char", Character.TYPE.getName());
@@ -304,20 +293,5 @@ public class XMLMethodInspector implements MethodInspector {
 				this.normalize(item);
 			}
 		}
-	}
-	/**
-	 * @see net.java.dev.jminimizer.util.MethodInspector#remove(net.java.dev.jminimizer.beans.Method)
-	 */
-	public boolean remove(Method method) throws ClassNotFoundException {
-		//test if this method was overrided from a super class
-		System.out.println("foi");
-		if (methodsNoRemove.contains(method.getNameAndSignature())) {
-			if (ClassUtils.isMethodOverridFromSuperClass(method)) {
-				log.debug("Method overrided from super class: " + method);
-				return false;
-			}
-		}
-		//test if this method is in a pattern
-		return !reNotRemove.match(method.toPattern());
 	}
 }

@@ -1,7 +1,5 @@
 package dummy;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Thiago Leão Moreira
@@ -9,8 +7,10 @@ import org.apache.commons.logging.LogFactory;
  *  
  */
 public class Teacher extends Worker {
+	
+	static int x=0;
 
-	private static final Log log = LogFactory.getLog(Teacher.class);
+//	private static final Log log = LogFactory.getLog(Teacher.class);
 	
 	/**
 	 *  

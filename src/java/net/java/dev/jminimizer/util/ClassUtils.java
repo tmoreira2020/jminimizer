@@ -34,16 +34,27 @@ public class ClassUtils {
 	public static Method findMethod(String className, String name, String signature) throws ClassNotFoundException {
 		ClassGen clazz = new ClassGen(Repository.lookupClass(className));
 		org.apache.bcel.classfile.Method method;
+		Method m= null;
 		do {
 			method = clazz.containsMethod(name, signature);
 			if (method != null) {
-				Method m= new Method(clazz.getClassName(), method.getName(), method.getSignature());
+				m= new Method(clazz.getClassName(), method.getName(), method.getSignature());
 				log.debug("Method find: " + m);
 				return m;
 			}
-			clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
+			if (clazz.isInterface()) {
+				String[] interfaces= clazz.getInterfaceNames();
+				for (int i = 0; i < interfaces.length; i++) {
+					m= ClassUtils.findMethod(interfaces[i], name, signature);
+					if (m != null) {
+						return m;
+					}
+				}
+			} else {
+				clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
+			}
 		} while (!clazz.getClassName().equals("java.lang.Object"));
-		return null;
+		return m;
 	}
 
 	public static FieldGen findField(String className, String name) throws ClassNotFoundException {

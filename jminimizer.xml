@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE configuration SYSTEM "./resources/configuration.dtd" >
-    <configuration>
-    <inspect>
-        <class name="net.java.dev.jminimizer.JMinimizer" knowTime="compiletime">
-            <method name="main">
-                <arguments>
-                    <classType name="java.lang.String[]"/>
-                </arguments>
-                <return>
-                	<void></void>
-                </return>
-            </method>
-        </class>
-		<class name="org.apache.commons.logging.impl.LogFactoryImpl" knowTime="runtime">
+<configuration>
+	<inspect>
+		<class name="net.java.dev.jminimizer.JMinimizer" knowTime="compiletime">
+			<method name="main">
+				<arguments>
+					<classType name="java.lang.String[]"/>
+				</arguments>
+				<return>
+					<void></void>
+				</return>
+			</method>
+		</class>
+		<class name="org.apache.commons.logging.impl.LogFactoryImpl" 
+			knowTime="runtime">
 			<constructor>
 				<arguments>
 				</arguments>
 			</constructor>
 		</class>
-		<class name="org.apache.commons.logging.impl.SimpleLog" knowTime="runtime">
+		<class name="org.apache.commons.logging.impl.SimpleLog" 
+			knowTime="runtime">
 			<constructor>
 				<arguments>
 					<classType name="java.lang.String"/>
@@ -27,37 +29,67 @@
 		</class>
 		<class knowTime="runtime" name="org.apache.bcel.generic.GETSTATIC">
 			<constructor>
-				<arguments>					
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.GETFIELD">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.LDC_W">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.LDC2_W">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.PUTSTATIC">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.CHECKCAST">
+			<constructor>
+				<arguments>
 				</arguments>
 			</constructor>
 		</class>
 		<class knowTime="runtime" name="org.apache.bcel.generic.ALOAD">
 			<constructor>
-				<arguments>					
+				<arguments>
 				</arguments>
 			</constructor>
 		</class>
 		<class knowTime="runtime" name="org.apache.bcel.generic.NEW">
 			<constructor>
-				<arguments>					
+				<arguments>
 				</arguments>
 			</constructor>
 		</class>
 		<class knowTime="runtime" name="org.apache.bcel.generic.FLOAD">
 			<constructor>
-				<arguments>					
+				<arguments>
 				</arguments>
 			</constructor>
 		</class>
 		<class knowTime="runtime" name="org.apache.bcel.generic.ASTORE">
 			<constructor>
-				<arguments>					
+				<arguments>
 				</arguments>
 			</constructor>
 		</class>
 		<class knowTime="runtime" name="org.apache.bcel.generic.INVOKESPECIAL">
 			<constructor>
-				<arguments>					
+				<arguments>
 				</arguments>
 			</constructor>
 		</class>
@@ -79,7 +111,8 @@
 				</arguments>
 			</constructor>
 		</class>
-		<class knowTime="runtime" name="org.apache.bcel.generic.INVOKEINTERFACE">
+		<class knowTime="runtime" 
+			name="org.apache.bcel.generic.INVOKEINTERFACE">
 			<constructor>
 				<arguments>
 				</arguments>
@@ -109,10 +142,210 @@
 				</arguments>
 			</constructor>
 		</class>
-    </inspect>
-    <notInspect>
-    	<pattern>
-    		java*
-    	</pattern>
-    </notInspect>
+		<class knowTime="runtime" name="org.apache.bcel.generic.LSTORE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.ANEWARRAY">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.NEWARRAY">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.SIPUSH">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.DSTORE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.ISTORE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IINC">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPLT">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IMPDEP2">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.FSTORE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFNULL">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFNE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFNONNULL">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFEQ">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.PUTFIELD">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPNE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPGT">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPLT">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPEQ">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPGE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ICMPLE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFGT">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFLT">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFGE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ACMPNE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IF_ACMPEQ">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.LLOAD">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.INSTANCEOF">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.LOOKUPSWITCH">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.TABLESWITCH">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFLE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.IFLE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.classfile.Method">
+			<method name="toString">
+				<arguments>
+					
+				</arguments>
+				<return>
+					<classType name="java.lang.String"/>
+				</return>
+			</method>
+		</class>
+	</inspect>
+	<notInspect>
+		<pattern> java* </pattern>
+	</notInspect>
 </configuration>

@@ -2,13 +2,14 @@ package net.java.dev.jminimizer.beans;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.apache.bcel.generic.MethodGen;
 /**
  * @author Thiago Leão Moreira <thiago.leao.moreira@terra.com.br>
  *  
  */
 public class Class {
-	private Class superClass;
+	private Set superClasses;
 	private String name;
 	private Set fields;
 	private Set methods;
@@ -22,6 +23,7 @@ public class Class {
 		this.fields = new HashSet();
 		this.methods = new HashSet();
 		this.subClasses = new HashSet();
+		this.superClasses = new HashSet();
 	}
 	/**
 	 *  
@@ -88,7 +90,7 @@ public class Class {
 	public Set getOverridedMethods(Method[] ms) {
 		Set set = new HashSet();
 		for (int i = 0; i < ms.length; i++) {
-			if (this.containsMethod(ms[i].getName(), ms[i].getSignature())) {
+			if (!ms[i].getName().startsWith("<ini") && this.containsMethod(ms[i].getName(), ms[i].getSignature())) {
 				set.add(ms[i]);
 			}
 		}
@@ -164,16 +166,17 @@ public class Class {
 	/**
 	 * @return Returns the superClass.
 	 */
-	public Class getSuperClass() {
-		return this.superClass;
+	public Set getSuperClass() {
+		return this.superClasses;
 	}
 	/**
 	 * @param superClass
 	 *            The superClass to set.
 	 */
-	public void setSuperClass(Class superClass) {
-//		System.out.println("SUPER: " + superClass.getName() + "FILJHA: " +this.getName());;
-		this.superClass = superClass;
+	public void addSuperClass(Class clazz) {
+		if (superClasses.add(clazz)) {
+//			System.out.println("SUPER: " + superClass.getName() + "FILJHA: " +this.getName());;
+		}
 	}
 	/**
 	 * @return Returns the subClasses.
@@ -186,4 +189,11 @@ public class Class {
 			//System.out.println("SUPER: " + super.hashCode() + name + "   SUB:"+ clazz.getName());
 		}
 	}
+	
+/*	public void debug() {
+		Class[] sdf= this.getSubClasses();
+		for (int i = 0; i < sdf.length; i++) {
+			System.out.println(sdf[i].getName());
+		}
+	}*/
 }

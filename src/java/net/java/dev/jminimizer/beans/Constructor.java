@@ -6,6 +6,7 @@ import org.apache.bcel.generic.Type;
  *  
  */
 public class Constructor extends Method {
+	
 	/**
 	 * @param className
 	 * @param argumentClasses
