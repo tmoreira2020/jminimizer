@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT configuration (programClasspath,runtimeClasspath?,inspect,notInspect?, output?, report?)>
+<!ELEMENT configuration (programClasspath,runtimeClasspath?,inspect, excludeResources?, notInspect?, output?, report?)>
 <!ATTLIST configuration deepStripment (true|false) #IMPLIED>
 
 <!ELEMENT programClasspath (url*, directory*, fileset*)>
@@ -39,7 +39,9 @@
 
 <!ELEMENT void EMPTY>
 
-<!ELEMENT notInspect (pattern*)>
+<!ELEMENT excludeResources (pattern+)>
+
+<!ELEMENT notInspect (pattern+)>
 <!ELEMENT pattern (#PCDATA)>
 
 <!ELEMENT output (directory|file)>

@@ -286,9 +286,10 @@ public class Analyser {
             ConstantPoolGen pool) throws ClassNotFoundException {
         Set methods = new HashSet();
         for (int i = 0; i < instructions.length; i++) {
-            Method method = ClassUtils.findMethod(instructions[i]
-                    .getClassName(pool), instructions[i].getName(pool),
-                    instructions[i].getSignature(pool));
+            String className= instructions[i].getClassName(pool);
+            Method method = ClassUtils.findMethod(inspecter, classes,
+                    instructions[i]
+                                    .getClassName(pool), instructions[i].getName(pool), instructions[i].getSignature(pool));
             if (method == null) {
             	method= new Method(instructions[i].getClassName(pool), 
             			instructions[i].getName(pool),

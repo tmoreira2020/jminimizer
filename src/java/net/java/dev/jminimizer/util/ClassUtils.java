@@ -1,6 +1,9 @@
 package net.java.dev.jminimizer.util;
 
 
+
+import java.util.Set;
+
 import net.java.dev.jminimizer.beans.Method;
 
 import org.apache.bcel.Repository;
@@ -18,40 +21,49 @@ public class ClassUtils {
 
 	private static final Log log = LogFactory.getLog(ClassUtils.class);
 
-	public static boolean isMethodOverridFromSuperClass(Method method)
-		throws ClassNotFoundException {
-		String className= method.getClassName();
-		Class clazz = Class.forName(className);
-		//TODO verificar o relacionamento com interfaces e superinterfaces
-		if (className.equals("java.lang.Object") || clazz.isInterface()) {
-			return true;
-		} else {
-			clazz= clazz.getSuperclass();
-			return null != findMethod(clazz.getName(), method.getName(), method.getSignature());
-		}
-	}
-
-	public static Method findMethod(String className, String name, String signature) throws ClassNotFoundException {
+	public static Method findMethod(Configurator configurator, Set classesUsedByProgram, String className, String name, String signature) throws ClassNotFoundException {
 		ClassGen clazz = new ClassGen(Repository.lookupClass(className));
 		org.apache.bcel.classfile.Method method;
 		Method m= null;
 		do {
+		    className= clazz.getClassName();
+            //this is used to catch interfaces that has no method (just super interfaces of that has methods)
+            if (configurator.inspect(className) && classesUsedByProgram.add(className)) {
+            	//used just to relax de user
+            	log.info("Analysing class: "+className);
+            }
 			method = clazz.containsMethod(name, signature);
 			if (method != null) {
 				m= new Method(clazz.getClassName(), method.getName(), method.getSignature());
 				log.debug("Method find: " + m);
 				return m;
-			}
-			if (clazz.isInterface()) {
-				String[] interfaces= clazz.getInterfaceNames();
-				for (int i = 0; i < interfaces.length; i++) {
-					m= ClassUtils.findMethod(interfaces[i], name, signature);
-					if (m != null) {
-						return m;
-					}
-				}
 			} else {
-				clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
+				if (clazz.isInterface()) {
+					String[] interfaces= clazz.getInterfaceNames();
+					for (int i = 0; i < interfaces.length; i++) {
+			            //this is used to catch interfaces that has no method (just super interfaces of that has methods)
+			            if (configurator.inspect(interfaces[i]) && classesUsedByProgram.add(interfaces[i])) {
+			            	//used just to relax de user
+			            	log.info("Analysing class: "+interfaces[i]);
+			            }
+						ClassGen inter = new ClassGen(Repository.lookupClass(interfaces[i]));
+						method= inter.containsMethod(name, signature);
+						if (method != null) {
+							m= new Method(interfaces[i], method.getName(), method.getSignature());
+							log.debug("Method find: " + m);
+							return m;
+						}
+					}
+					for (int i = 0; i < interfaces.length; i++) {
+						m= ClassUtils.findMethod(configurator, classesUsedByProgram, interfaces[i], name, signature);
+						if (m != null) {
+							log.debug("Method find: " + m);
+							return m;
+						}
+                    }
+				} else {
+					clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
+				}
 			}
 		} while (!clazz.getClassName().equals("java.lang.Object"));
 		return m;
