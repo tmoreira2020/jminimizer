@@ -23,6 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * @author Thiago Leão Moreira <thiago.leao.moreira@terra.com.br>
@@ -72,7 +73,9 @@ public class XMLConfigurator implements Configurator {
         this.initPrimitives();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        builder.setErrorHandler(new XMLErrorHandler());
+        DefaultHandler handler= new XMLErrorHandler();
+        builder.setErrorHandler(handler);
+        builder.setEntityResolver(handler);
         Document document = builder.parse(file);
         this.normalize(document);
         Element root = document.getDocumentElement();

@@ -93,7 +93,7 @@ public class Analyser {
     
     private void proc(Method method) {
             try {
-                System.out.println(method);
+                //System.out.println(method);
                 MethodGen mg= method.toMethodGen();
                 Attribute[] a= mg.getAttributes();
                 for (int i = 0; i < a.length; i++) {
