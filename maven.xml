@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<project xmlns:j="jelly:core" xmlns:ant="jelly:ant">
+	<postGoal name="latex:prepare-filesystem">
+		<ant:copy todir="${maven.build.dir}/latex">
+			<fileset dir="${maven.latex.src.dir}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</ant:copy>
+	</postGoal>
+</project>
