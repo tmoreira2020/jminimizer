@@ -149,6 +149,7 @@ public class Analyser {
                 Iterator i = mgs.iterator();
                 while (i.hasNext()) {
                     MethodGen m = (MethodGen) i.next();
+//                    System.out.println(Method.toString(m));
                     this.analyse(m);
                 }
             } else {
@@ -185,6 +186,10 @@ public class Analyser {
             InvokeInstruction element = (InvokeInstruction) i.next();
             MethodGen m = this.findMethod(element, pool);
             Method method = new Method(m);
+            System.out.println(method);
+            if ("void com.datasul.crm.sfa.gui.UserHome.shortCutSelected(com.datasul.crm.sfa.lcdui.home.ShortCut)".equals(method.toString())) {
+                System.out.println(inspecter.inspect(m));
+            }
             if (inspecter.inspect(m)) {
                 methods.add(m);
             } else {
