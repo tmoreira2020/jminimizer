@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="configuration">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="1" minOccurs="0" name="inspect" type="setOfPatternType"/>
+                <xs:element maxOccurs="1" minOccurs="0" name="notInspect" type="setOfPatternType"/>
+                <xs:element maxOccurs="1" minOccurs="0" name="notRemove" type="setOfPatternType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="setOfPatternType">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="class" type="class"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="pattern" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="primitiveType" type="primitiveType"/>
+
+    <xs:element name="classType" type="classType"/>
+
+    <xs:complexType name="class">
+        <xs:sequence minOccurs="1">
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="constructor" type="constructorType"/>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="method" type="methodType"/>
+        </xs:sequence>
+        <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="constructorType">
+        <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="arguments" type="argumentType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="methodType">
+        <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="arguments" type="argumentType"/>
+            <xs:element maxOccurs="1" minOccurs="1" name="return">
+                <xs:complexType>
+                    <xs:choice>
+                        <xs:element ref="primitiveType"/>
+                        <xs:element ref="classType"/>
+                        <xs:element name="void"/>
+                    </xs:choice>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="argumentType">
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+            <xs:choice>
+                <xs:element ref="primitiveType"/>
+                <xs:element ref="classType"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="primitiveType">
+        <xs:attribute name="name" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="byte"/>
+                    <xs:enumeration value="short"/>
+                    <xs:enumeration value="char"/>
+                    <xs:enumeration value="int"/>
+                    <xs:enumeration value="float"/>
+                    <xs:enumeration value="long"/>
+                    <xs:enumeration value="double"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="classType">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+</xs:schema>

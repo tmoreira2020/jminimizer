@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+    <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="configuration.xsd">
+    <inspect>
+        <class name="dummy.Person">
+            <method name="setName">
+                <arguments>
+                    <classType name="java.lang.String"/>
+                </arguments>
+                <return>
+                    <void/>
+                </return>
+            </method>
+            <method name="getName">
+                <arguments/>
+                <return>
+                    <classType name="java.lang.String"/>
+                </return>
+            </method>
+        </class>
+        <class name="dummy.Teacher">
+            <constructor>
+                <arguments>
+                    <classType name="dummy.Teacher"/>
+                </arguments>
+            </constructor >
+        </class>
+    </inspect>
+</configuration>
