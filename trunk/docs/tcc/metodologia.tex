@@ -1,21 +1,5 @@
 \chapter{Metodologia}
-\section{Conceitos}
-Segundo Demo\cite{demo} diz "Metodologia é a preocupação instrumental. Trata das formas de se fazer ciência. Cuida dos procedimentos, das ferramentas, dos caminhos".
-
-Já Andrade\cite{andrade} afirma "Métodos são técnicas suficientemente gerais para se tornarem comuns a todas as ciências ou a uma significativa parte dela".
-
-Um método serve para descobrir o problema, encontrar soluções e validá-las\cite{lakatos}.
-\chapter{Pesquisa Bibliográfica}
+Desde que comecei a trabalhar como desenvolvedor Java, tive contato com inúmeros projetos \textit{open-source}\footnote{do inglês código-aberto} e dentre estes observei que alguns utilizavam a métodologia de desenvolvimento de software chamada de XP\footnote{eXtreme Programming}, que me chamou a atenção. Como nunca havia desenvolvido software baseado nessa metodologia, resolvi aplica-la, no desenvolvimento do JMinimizer. É claro que não consegui ser um extremista e seguir ao pé da letra o que XP recomenda, mas algumas práticas que achei interessante adotei no desenvolvimento desse trabalho, entre elas estão: a confecção de testes unitários e a liberação de versões num período menor. A criação de testes unitários mostrou ser de grande importância nas etapas de desenvolvimento, principalmente quando as alterações no código fonte eram profundas, pois terminada as alterações eram executados os testes unitários e validados ou não as alterações feitas. Já a liberação de versões num período menor foi pouco utilizado, pois como não haviam "clientes" esperando pelo software não foi preciso liberar versões, no entanto quando foi obtido uma versão estável do JMinimizer, foram gerados marcos no controlador de versão do projeto, para que posteriormente essas versões estáveis pudessem ser obtidas, mesmo depois de alterados os códigos fontes do programa.
+Também inspirado nos projeos \textit{open-source} e na minha vida profissional adotei ferramentas de desenvolvimento que se tornaram padrões na confecção de aplicações Java. Dentre todas, 6 programas foram essenciais. Inicando pelo sistema operacinal \textit{Fedora Core 1 e 2}\cite{fedora}, que é uma distribuição do sistema operacional Linux. O conjunto de ferramentas distribuídas pela Sun\cite{sun} para desenvolvimento de aplicações Java chamando de J2SE SDK\footnote{Software Development Kit} também foi utilizado nas suas versões 1.4.2\_02 e 1.4.2\_4. A IDE\footnote{Integrated Development Environment} Eclipse\cite{eclipse} foi o ambiente de desenvolvimento utilizado para criar o JMinimizer, seu compilador embutido para Java também foi instrumento de uso dessa tese. O controlador de versão CVS\footnote{Concurrent Versions System}\cite{cvs}, foi utilizado para manter de forma organizada as versões que eram geradas dia após dia do código fonte da aplicação. A versão 1.11.1p1 foi utilizado no servidor do CVS e as versão 1.11.15, 1.11.16 e 1.11.17 no cliente. Integrando todas essas ferramentas foi utilizado o Maven \cite{maven} para gerenciar o projeto. Tarefas como compilar, executar os testes unitários, gerar documentação, métricas, relatórios, criar artefatos, gereciar o controlador de versão eram executadas através da ferramenta Maven que provê uma interface única para execução de todas essas tarefas.
 
 
-\section{Cronograma}
-O cronograma para realização deste projeto foi estipulado inicialmente da seguinte forma.
-
-\begin{itemize}
-\item{Pesquisa Bibliográfica - Julho 2003 a Dezembro 2003}
-\item{Aprendizagem do framework Bcel\footnote{Bite Code Engineering Language} - Setembro 2003 a Novembro 2003}
-\item{Desenvolvimento do aplicativo - Outubro 2003 a Junho 2004}
-\item{Testes - Junho 2004 a Julho 2004}
-\item{Produção do artigo - Augusto 2004 a Setembro 2004}
-\item{Produção do trabalho escrito (Relatório de Pesquisa) - Julho 2004 a Outubro 2004}
-\end{itemize}

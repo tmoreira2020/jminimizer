@@ -1,0 +1,27 @@
+\chapter{Trabalhos futuros}
+
+Apesar de ter chegado à uma versão funcional e estável, ainda existem melhorias que podem ser adicionadas ao JMinimizer. A seguir estão listadas, em ordem crescente de prioridade, as ações que serão tomadas em relação ao projeto.
+
+\section{Submeter artigo ao BYTECODE 2005}
+Elaborar e submeter um artigo ao \textit{First Workshop on Bytecode Semantics, Verification, Analysis and Transformation}\cite{workshop} que ocorrerá em Edimburgo, Escócia no dia 9 de abril de 2005. 
+
+\section{Integração a um obfuscador}
+A integração com um obfuscador traria além de dificultar a engenharia reversa, uma diminuição do código final da aplicação. Esse segundo aspecto é de grande importância visto que o objetivo desse trabalho é mesmo diminuir o tamanho das aplicações. Exposto isso fica claro que uma integração com um obfuscador aumentará o percentual de compactação de uma aplicação.
+
+\section{Desenvolver um plugin para Maven}
+Atualmente uma grande quantidade de aplicativos possuem integração ao Maven, e essa integração é feita através de plugins. Uma versão beta desse plugin para o JMinimizer já esta em testes no entanto a falta de tempo paralizou seu desenvoilvimento.
+
+\section{Ampliar as formas de declarar métodos \textit{entry point}}
+Nos primeiros testes com aplicações reais surgiu a necessidade de declarar métodos que devem ser analisados de uma forma diferente da que a usual, por exemplo por pacotes. Essa melhoria traria diminuição na configuração do JMinimizer.
+
+\section{Compatibilização com o J2SE 5.0}
+Recentemente foi lançado a versão 5.0 da plataforma J2SE\footnote{Java 2 Standart Edition}, que traz entre outras coisas o recurso de Anotações, que possibilita o desenvolvedor marcar métodos e campos para que outras ferramentas possam identifica-los e processa-los facilmente. No entanto esse novo recurso de Java impactou na modificação da estrutura do bytecode, portanto a atual versão do JMinimizer e também BCEL é imcompatível com esta versão da plataforma. Assim que BCEL for compatível com a nova plataforma será iniciado um esforço para, também, compatibilizar o JMinimizer a plataforma 5.0 do J2SE. Como foi adquirido grande conhecimento da biblioteca BCEL, tanto nas ferramentas como até mesmo no código fonte, me disponibilizei para ajudar na compatibilização do BCEL ao Java 5.0.
+
+\section{Testar diferentes compiladores}
+Atualmente os testes feitos com o JMinimizer foram realizados com o bytecode gerado por somente dois compiladores. O compilador fornecido pela Sun\cite{sun} e o compilador embutido na IDE Eclipse\cite{eclipse}. No entanto existem muitos compiladores para a linguagem Java e é de extrema necessidade que para todos os compiladores que um desenvolvedor possa utilizar que o JMinimizer analise e transforme o bytecode de forma correta. Para isso há a necessidade de testar e homologar o JMinimizer com estes compiladores.
+
+\section{Geração de relatórios}
+A geração de relatórios é algo que está parcialmente implementado, visto que a geração de arquivos XML com os métodos e campos que são excluidos já é feita. No entanto arquivos XML são de difícil interpretação por humanos. Arquivos PDF\footnote{Portable Document Format} e HTML\footnote{HyperText Mark-up Language} são de melhor entendimento e para a geração destes arquivos basta uma simples transformação de um arquivos XML com uma folha de estilo XSL\footnote{eXtensible Stylesheet Language}. 
+
+\section{Desenvolver uma interface gráfica}
+O desenvolvimento de uma interface gráfica para o JMinimizer também esta planejado para ser desenvolvido, no entanto sua prioridade é baixa. Na interface gráfica seriam criados \textit{wizards} para configurar o JMinimizer, para gerar relatórios em diversos formatos (PDF, HTML). A execução do JMinimizer também poderia ser feita através dessa interface, possibilitando até uma barra de progresso indicando as etapas de execução do JMinimizer.
