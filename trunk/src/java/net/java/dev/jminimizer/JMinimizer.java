@@ -41,10 +41,11 @@ public class JMinimizer {
 		Repository repo= new URLRepository(configurator.getProgramClasspath(), configurator.getRuntimeClasspath());
 		System.out.println("Analysing...");
 		Analyser an= new Analyser(configurator, repo);
-		Set methods= new HashSet();
-		an.analyse(configurator.getMethodsToInspect(), methods);
+		Set usedMethods= new HashSet();
+		an.analyse(configurator.getMethodsToInspect(), usedMethods);
 		System.out.println("Transforming...");
-		Transformer visitor= new Transformer(methods, configurator, repo);
+		Set methodsThatUseClassForName= an.getMethodsThatUseClassForName();
+		Transformer visitor= new Transformer(configurator, repo, usedMethods, methodsThatUseClassForName);
 		an.receiveVisitor(visitor);
 		visitor.finish();
 	}

@@ -46,7 +46,7 @@ public class Analyser {
 
     protected Set classes;
 
-    public static Set runtimeClassLoaderMethods;
+    protected Set methodsThatUseClassForName;
 
     /**
      * @param inspecter
@@ -61,7 +61,7 @@ public class Analyser {
         this.repository = repo;
         this.notProcessedMethods = new HashSet();
         this.classes = new HashSet();
-        this.runtimeClassLoaderMethods = new HashSet();
+        this.methodsThatUseClassForName = new HashSet();
         Repository.setRepository(this.repository);
     }
 
@@ -83,27 +83,25 @@ public class Analyser {
             notProcessedMethods.clear();
             this.analyse(methods, usedMethods);
         }
-        System.out.println("RUNTIME class: " +runtimeClassLoaderMethods.size());
+        log.debug("Quantidade de métodos que utilizam java.lang.Class.forName(java.lang.String className): " + methodsThatUseClassForName.size());
     }
     
     private void proc(Method method) {
-            try {
-                //System.out.println(method);
-                MethodGen mg= method.toMethodGen();
-                Attribute[] a= mg.getAttributes();
-                for (int i = 0; i < a.length; i++) {
-                    if (a[i] instanceof Synthetic && method.getName().equals(Transformer.METHOD_SYNTHETIC_NAME)) {
-                        System.out.println("É O CARA");
-                        return;
-                    }
+        try {
+            MethodGen mg= method.toMethodGen();
+            Attribute[] a= mg.getAttributes();
+            for (int i = 0; i < a.length; i++) {
+                if (a[i] instanceof Synthetic && method.getName().equals(Transformer.METHOD_SYNTHETIC_NAME)) {
+                    System.out.println("É O CARA");
+                    return;
                 }
-                log.warn(method);
-                runtimeClassLoaderMethods.add(method);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
-            
+            log.warn(method);
+            methodsThatUseClassForName.add(method);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -315,5 +313,11 @@ public class Analyser {
                 i++;
             }
         }
+    }
+    /**
+     * @return Returns the methodsThatUseClassForName.
+     */
+    public Set getMethodsThatUseClassForName() {
+        return methodsThatUseClassForName;
     }
 }
