@@ -19,8 +19,12 @@ import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import net.java.dev.jminimizer.beans.Field;
+
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.Method;
+import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -159,9 +163,7 @@ public class URLRepository implements Repository {
                 }
                 byte[] data;
                 try {
-                    ClassParser parser = new ClassParser(url.openStream(),
-                            className);
-                    jc = parser.parse();
+                    jc= this.parseClass(url.openStream(), className);
                     programClasses.put(className, jc);
                 } catch (IOException e) {
                     log.debug("Error on reading the URL", e);
@@ -172,9 +174,11 @@ public class URLRepository implements Repository {
             if (jc == null) {
                 InputStream in = rc.getResourceAsStream(className.replace('.',
                         File.separatorChar).concat(".class"));
+                if (in == null) {
+                    throw new ClassNotFoundException(className);
+                }
                 try {
-                    ClassParser parser = new ClassParser(in, className);
-                    jc = parser.parse();
+                    jc= this.parseClass(in, className);
                     runtimeClasses.put(className, jc);
                 } catch (IOException e) {
                     log.debug("Error on reading the URL", e);
@@ -198,8 +202,7 @@ public class URLRepository implements Repository {
             clazz = this.normalizeClass(clazz);
             try {
                 if (!programClasses.containsKey(clazz)) {
-                    programClasses.put(clazz, new ClassParser(
-                            new FileInputStream(file), clazz).parse());
+                    programClasses.put(clazz, this.parseClass(new FileInputStream(file), clazz));
                 }
             } catch (IOException e) {
                 //never here
@@ -218,8 +221,8 @@ public class URLRepository implements Repository {
                 JarEntry entry = (JarEntry) i.next();
                 String clazz = this.normalizeClass(entry.getName());
                 if (!programClasses.containsKey(clazz)) {
-                    programClasses.put(clazz, new ClassParser(new URL(jar,
-                            entry.getName()).openStream(), clazz).parse());
+                    programClasses.put(clazz, this.parseClass(new URL(jar,
+                            entry.getName()).openStream(), clazz));
                 }
             }
         } catch (IOException e) {
@@ -250,6 +253,38 @@ public class URLRepository implements Repository {
      */
     public void storeClass(JavaClass clazz) {
         	throw new RuntimeException("No sense in this class!!");
+    }
+
+    /**
+     * @see net.java.dev.jminimizer.util.Repository#loadClass(java.lang.String, boolean)
+     */
+    public net.java.dev.jminimizer.beans.Class loadClass(String className, boolean loadMembers)
+            throws ClassNotFoundException {
+        JavaClass jc= this.loadClass(className);
+        net.java.dev.jminimizer.beans.Class clazz= new net.java.dev.jminimizer.beans.Class(jc.getClassName());
+        if (loadMembers) {
+            this.loadMembers(clazz, jc);
+        }
+        return clazz;
+    }
+
+    private void loadMembers(net.java.dev.jminimizer.beans.Class clazz, JavaClass jc) throws ClassNotFoundException {
+        String className= clazz.getName();
+        Method[] ms= jc.getMethods();
+        for (int i = 0; i < ms.length; i++) {
+            clazz.add(new net.java.dev.jminimizer.beans.Method(className, ms[i].getName(), Type.getMethodSignature(ms[i].getReturnType(), ms[i].getArgumentTypes()), false));
+        }
+        org.apache.bcel.classfile.Field[] fs = jc.getFields();
+        for (int i = 0; i < fs.length; i++) {
+            clazz.add(new Field(className, fs[i].getName(), fs[i].getSignature()));
+        }
+    }
+    
+    private JavaClass parseClass(InputStream in, String className) throws IOException {
+        ClassParser parser = new ClassParser(in, className);
+        JavaClass jc = parser.parse();
+        jc.setRepository(this);
+        return jc;
     }
 
 }

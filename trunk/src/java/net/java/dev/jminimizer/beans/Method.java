@@ -1,5 +1,6 @@
 package net.java.dev.jminimizer.beans;
 import org.apache.bcel.Repository;
+import org.apache.bcel.classfile.Utility;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.MethodGen;
 import org.apache.bcel.generic.Type;
@@ -40,22 +41,14 @@ public class Method extends FieldOrMethod {
 	/**
 	 *  
 	 */
-	public Method(java.lang.Class className, String name,
-			java.lang.Class[] argumentClasses, java.lang.Class returnClass,
+	public Method(String className, String name,
+			String[] argumentClasses, String returnClass,
 			boolean inSubClasses) {
-		Type[] argumentTypes = new Type[argumentClasses.length];
-		for (int i = 0; i < argumentTypes.length; i++) {
-			argumentTypes[i] = Type.getType(argumentClasses[i]);
-		}
-		this.setClassName(className.getName());
-		this.setName(name);
-		this.setSignature(Type.getMethodSignature(Type.getType(returnClass),
-				argumentTypes));
-		this.inSubClasses = inSubClasses;
+	    this(className, name, Utility.methodTypeToSignature(returnClass, argumentClasses), inSubClasses);
 	}
 	/**
 	 *  
-	 */
+	 *
 	public Method(java.lang.reflect.Method method) {
 		this(method.getDeclaringClass(), method.getName(), method
 				.getParameterTypes(), method.getReturnType(), false);
