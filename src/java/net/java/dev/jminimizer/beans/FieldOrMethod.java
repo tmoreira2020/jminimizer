@@ -89,7 +89,7 @@ public abstract class FieldOrMethod {
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return className.hashCode() + name.hashCode() + signature.hashCode();
+        return className.hashCode() ^ name.hashCode() ^ signature.hashCode();
     }
 
     /**

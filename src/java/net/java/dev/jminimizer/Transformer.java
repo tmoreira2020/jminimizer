@@ -1,11 +1,14 @@
 package net.java.dev.jminimizer;
 
+import java.awt.font.LineMetrics;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -24,11 +27,20 @@ import net.java.dev.jminimizer.util.Visitor;
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Attribute;
 import org.apache.bcel.classfile.Constant;
+import org.apache.bcel.classfile.ConstantCP;
+import org.apache.bcel.classfile.ConstantClass;
+import org.apache.bcel.classfile.ConstantDouble;
+import org.apache.bcel.classfile.ConstantFieldref;
 import org.apache.bcel.classfile.ConstantMethodref;
 import org.apache.bcel.classfile.ConstantNameAndType;
 import org.apache.bcel.classfile.ConstantPool;
+import org.apache.bcel.classfile.ConstantString;
 import org.apache.bcel.classfile.ConstantUtf8;
+import org.apache.bcel.classfile.ExceptionTable;
+import org.apache.bcel.classfile.Field;
 import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.LineNumber;
+import org.apache.bcel.classfile.LineNumberTable;
 import org.apache.bcel.classfile.LocalVariable;
 import org.apache.bcel.classfile.LocalVariableTable;
 import org.apache.bcel.classfile.SourceFile;
@@ -38,7 +50,10 @@ import org.apache.bcel.generic.ALOAD;
 import org.apache.bcel.generic.ARETURN;
 import org.apache.bcel.generic.ATHROW;
 import org.apache.bcel.generic.BasicType;
+import org.apache.bcel.generic.CHECKCAST;
+import org.apache.bcel.generic.CPInstruction;
 import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.CodeExceptionGen;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.DUP;
 import org.apache.bcel.generic.GETSTATIC;
@@ -50,11 +65,16 @@ import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
 import org.apache.bcel.generic.InstructionTargeter;
 import org.apache.bcel.generic.LDC;
+import org.apache.bcel.generic.LDC2_W;
+import org.apache.bcel.generic.LocalVariableGen;
 import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.NEW;
 import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.generic.POP;
+import org.apache.bcel.generic.SWAP;
 import org.apache.bcel.generic.TargetLostException;
 import org.apache.bcel.generic.Type;
+import org.apache.bcel.util.BCELComparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -89,7 +109,6 @@ public class Transformer implements Visitor {
     public Transformer(Set usedMethods, Configurator configurator,
             Repository repo) throws IOException {
         super();
-
         this.usedMethods = usedMethods;
         this.configurator = configurator;
         this.repo = repo;
@@ -113,9 +132,11 @@ public class Transformer implements Visitor {
                 .concat(".class");
         OutputStream stream;
         if (out == null) {
-            File file = new File(configurator.getTransformationOutput(),
-                    classFile);
-            file.mkdirs();
+            File file= new File(configurator.getTransformationOutput(), classFile);
+            File directory= file.getParentFile();
+            if (directory != null) {
+                directory.mkdirs();
+            }
             stream = new FileOutputStream(file);
         } else {
             ZipEntry entry = new ZipEntry(classFile);
@@ -180,7 +201,7 @@ public class Transformer implements Visitor {
         if (classes.contains(className)) {
             JavaClass jc = repo.findClass(className);
             ClassGen cg = new ClassGen(jc);
-            if (className.indexOf("$") == -1) {
+//            if (className.indexOf("$") == -1) {
                 org.apache.bcel.classfile.Method[] ms = jc.getMethods();
                 log.debug("Cleaning class: " + className);
                 for (int i = 0; i < ms.length; i++) {
@@ -203,14 +224,23 @@ public class Transformer implements Visitor {
                             cg.replaceMethod(mc ,this.tran(m.toMethodGen(), pool));
                             cg.setConstantPool(pool);
                         }
-                        cg.removeAttribute(ms[i].getLineNumberTable());
-                        cg.removeAttribute(ms[i].getLocalVariableTable());
                     }
                 }
-            } else {
+                Field[] fields= jc.getFields();
+                for (int i = 0; i < fields.length; i++) {
+                    net.java.dev.jminimizer.beans.Field field= new net.java.dev.jminimizer.beans.Field(className, fields[i].getName(), fields[i].getSignature());
+                    if(!usedMethods.contains(field)) {
+                        if (className.indexOf("TextScanner") != -1) {
+                            System.out.println("DELETAR field"+field);
+                        }
+                        cg.removeField(fields[i]);
+                    }
+                }
+      
+  //          } else {
                 //Classes com nomes com o caracter $
                 //System.out.println(className);
-            }
+    //        }
             Attribute[] attrs = cg.getAttributes();
             for (int i = 0; i < attrs.length; i++) {
                 if (attrs[i] instanceof SourceFile) {
@@ -220,6 +250,7 @@ public class Transformer implements Visitor {
                     //System.out.println(attrs[i]);
                 }
             }
+            this.updateClassGen(cg);
             cg.update();
             this.dump(cg.getJavaClass());
             if (eClazz.hasChildNodes()) {
@@ -237,6 +268,7 @@ public class Transformer implements Visitor {
     }
     
     private org.apache.bcel.classfile.Method tran(MethodGen method, ConstantPoolGen pool) throws Exception {
+        //method.stripAttributes(true);
         Attribute[] attrs= method.getAttributes();
         InstructionList code= method.getInstructionList();
         InstructionHandle[] ins= code.getInstructionHandles();
@@ -245,7 +277,7 @@ public class Transformer implements Visitor {
             if (attrs[i] instanceof Synthetic && !method.getName().equals(METHOD_SYNTHETIC_NAME)) {
                 this.updateConstantPool(pool, method.getClassName());
                 InstructionHandle temp= code.getStart();
-                method.removeExceptionHandlers();
+                //method.removeExceptionHandlers();
 /*                while (temp != null) {
                     if (temp.hasTargeters()) {
                         InstructionTargeter[] tar=temp.getTargeters();
@@ -256,24 +288,40 @@ public class Transformer implements Visitor {
                     }
                     temp= temp.getNext();
                 }
-  */              System.out.println("SINTETICO");
+  */              //System.out.println("SINTETICO");
                 InstructionFactory factory= new InstructionFactory(pool);
                 start= code.getStart();
                 temp= start.getNext();
                 code.insert(temp, this.getin(pool, classname));
-                code.insert(temp, new ARETURN());
+                InstructionHandle newEnd= code.insert(temp, new ARETURN());
                 try {
                     code.delete(temp, end= code.getEnd());
                 } catch (TargetLostException e) {
+                    //System.out.println("ERRRRRO");
                     InstructionHandle[] targets = e.getTargets();
                	 	for(int d=0; d < targets.length; d++) {
                	 	    InstructionTargeter[] targeters = targets[d].getTargeters();
                	 	    for(int j=0; j < targeters.length; j++) {
-                   	 	    System.out.println(targeters[j]);
-               	 	        targeters[j].updateTarget(targets[d], code.getEnd());
+               	 	        if (targeters[j] instanceof CodeExceptionGen) {
+               	 	            method.removeExceptionHandler((CodeExceptionGen)targeters[j]);
+               	 	          //System.out.println("è CODEEXCPTIONGEN");  
+               	 	        }
+               	 	        if (targeters[j] instanceof LocalVariableGen) {
+               	 	            LocalVariableGen lvg= (LocalVariableGen) targeters[j];
+               	 	            //TODO
+           	 	                method.removeLocalVariable(lvg);
+               	 	            LocalVariable lv= lvg.getLocalVariable(pool);
+               	 	            if (lv.getStartPC() == 0) {
+               	 	                lvg.setEnd(newEnd);
+               	 	                //lvg= method.addLocalVariable(lvg.getName(), lvg.getType(), lv.getNameIndex(), lvg.getStart(), newEnd);
+               	 	            } else {
+               	 	                method.removeLocalVariable(lvg);
+               	 	            }
+               	 	        }
+               	 	        //targeters[j].updateTarget(targets[d], code.getEnd());
                	 	    }
                     }                
-                    e.printStackTrace();
+                    //e.printStackTrace();
                	}
                 System.out.println(code);
                 break;
@@ -288,15 +336,13 @@ public class Transformer implements Visitor {
                 	&& ins[j+4].getInstruction() instanceof LDC) {
                 start= ins[j+5];
                 end= ins[j+14];
-                System.out.println(start.toString());
-                System.out.println(end);
                 this.updateMethod(start, end, code, pool, method);
                 this.updateConstantPool(pool, method.getClassName());
 
                 //TODO transformar este trecho de codigo em um método synthetic
             }
         }
-        LocalVariableTable lct= method.getLocalVariableTable(pool);
+/*        LocalVariableTable lct= method.getLocalVariableTable(pool);
         if (lct.getLength() != 0) {
             LocalVariable[] lvs= lct.getLocalVariableTable();
             method.removeLocalVariables();
@@ -310,7 +356,7 @@ public class Transformer implements Visitor {
 	            method.addLocalVariable(lc.getName(), Type.getType(lc.getSignature()), code.getStart(), code.getEnd());
             }
         }
-        return method.getMethod();
+  */      return method.getMethod();
     }
     
     
@@ -320,19 +366,22 @@ public class Transformer implements Visitor {
         InstructionList code= new InstructionList();
         InstructionFactory factory= new InstructionFactory(pool);
         Instruction i= InstructionFactory.createLoad(Type.STRING, 0);
-        code.append(i);
+        InstructionHandle startPC;
+        startPC= code.append(i);
+        //startPC= code.append(new LDC(pool.addString("java.lang.Net")));
+        i= factory.createInvoke("java.lang.Class", "forName", returnType, new Type[]{Type.STRING}, Constants.INVOKESTATIC);
+        InstructionHandle endPC =code.append(i);
         int out = pool.addFieldref("java.lang.System", "out", "Ljava/io/PrintStream;");
         int println = pool.addMethodref("java.io.PrintStream", "println", "(Ljava/lang/String;)V");
+//        code.append(new DUP());
         code.append(new GETSTATIC(out));
         code.append(new ALOAD(0));
         code.append(new INVOKEVIRTUAL(println));
-        i= factory.createInvoke("java.lang.Class", "forName", returnType, new Type[]{Type.STRING}, Constants.INVOKESTATIC);
-        code.append(i);
         code.append(factory.createPrintln("FOIIIIII"));
         i= InstructionFactory.createReturn(returnType);
         code.append(i);
         i=  InstructionFactory.createStore(Type.OBJECT, 1);
-        InstructionHandle errorHandler= code.append(i);
+        InstructionHandle handlerPC=code.append(i);
         i= factory.createNew(new ObjectType("java.lang.NoClassDefFoundError"));
         code.append(i);
         code.append(new DUP());
@@ -344,11 +393,12 @@ public class Transformer implements Visitor {
         code.append(i);
         code.append(new ATHROW());
         MethodGen mg= new MethodGen(accessFlag, returnType, new Type[]{Type.STRING}, new String[]{"className"}, METHOD_SYNTHETIC_NAME, className, code, pool);
-        mg.addExceptionHandler(code.getStart(), code.getEnd(), errorHandler, new ObjectType("java.lang.ClassNotFoundException"));
+        CodeExceptionGen ceg= mg.addExceptionHandler(startPC, endPC, handlerPC, new ObjectType("java.lang.ClassNotFoundException"));
        mg.setMaxStack();
         mg.setMaxLocals();
         int x= pool.addConstant(new ConstantUtf8("Synthetic"), pool);
-        System.out.println(x);
+        mg.removeLineNumbers();
+//        System.out.println(x);
         mg.addAttribute(new Synthetic(x, 0, null, pool.getConstantPool()));
         return mg;
     }
@@ -363,7 +413,7 @@ public class Transformer implements Visitor {
     
     private void updateMethod(InstructionHandle start, InstructionHandle end, InstructionList code, ConstantPoolGen pool, MethodGen method) throws TargetLostException {
         InstructionHandle temp= start;
-        while (temp != end) {
+/*        while (temp != end) {
             if (temp.hasTargeters()) {
                 InstructionTargeter[] tar=temp.getTargeters();
                 for (int k = 0; k < tar.length; k++) {
@@ -373,17 +423,45 @@ public class Transformer implements Visitor {
             }
             temp= temp.getNext();
         }
+*/
         code.insert(start, this.getin(pool, classname));
         temp= start.getNext().getNext().getNext();
-        System.out.println(temp);
-        code.delete(temp, end);
-        code.delete(start);
+//        System.out.println(temp);
+        try {
+            code.delete(temp, end);
+        } catch (TargetLostException e) {
+            InstructionHandle[] handles= e.getTargets();
+            for (int i = 0; i < handles.length; i++) {
+                InstructionTargeter[] targets= handles[i].getTargeters();
+                for (int j = 0; j < targets.length; j++) {
+                    if (targets[j] instanceof CodeExceptionGen) {
+                        CodeExceptionGen ceg= (CodeExceptionGen) targets[j];
+                        method.removeExceptionHandler(ceg);
+                    }
+                }
+            }
+        }
+        
+        try {
+            code.delete(start);
+        } catch (TargetLostException e) {
+            InstructionHandle[] handles= e.getTargets();
+            for (int i = 0; i < handles.length; i++) {
+                InstructionTargeter[] targets= handles[i].getTargeters();
+                for (int j = 0; j < targets.length; j++) {
+                    if (targets[j] instanceof CodeExceptionGen) {
+                        CodeExceptionGen ceg= (CodeExceptionGen) targets[j];
+                        method.removeExceptionHandler(ceg);
+                    }
+                }
+            }
+        }
         method.setConstantPool(pool);
         method.setInstructionList(code);
     }
     
     private void updateConstantPool(ConstantPoolGen pool, String className) {
-        if (!classname.equals(className)) {
+/*        if (!classname.equals(className)) {
             System.out.println(pool.getSize());
             for (int j = 0; j < pool.getSize(); j++) {
                 Constant cons= pool.getConstant(j);
@@ -404,7 +482,183 @@ public class Transformer implements Visitor {
                 }
             }
         }
-
+*/
     }
+    
+    private Constant[] lookupClass(String className, ConstantPoolGen pool) {
+        Constant[] ret= new Constant[2];
+        int index= pool.lookupClass(className);
+        ret[1]= pool.getConstant(index);
+        ret[0]= pool.getConstant(((ConstantClass)pool.getConstant(index)).getNameIndex());
+        return ret;
+    }
+    
+    private void updateClassGen(ClassGen cg) {
+        Set general= new HashSet();
+        ConstantPoolGen pool= cg.getConstantPool();
+        Constant[] intArray= this.lookupClass(cg.getClassName(), pool);
+        for (int i = 0; i < intArray.length; i++) {
+            general.add(intArray[i]);
+        }
+        intArray= this.lookupClass(cg.getSuperclassName(), pool);
+        for (int i = 0; i < intArray.length; i++) {
+            general.add(intArray[i]);
+        }
+        String[] interfaces= cg.getInterfaceNames();
+        for (int i = 0; i < interfaces.length; i++) {
+            intArray= this.lookupClass(interfaces[i], pool);
+            for (int j = 0; j < intArray.length; j++) {
+                general.add(intArray[j]);
+            }
+        }
+        int index= pool.lookupUtf8("L"+cg.getClassName()+";");
+        if (index != -1) {
+            general.add(pool.getConstant(index));
+        }
+        index= pool.lookupUtf8(cg.getFileName());
+        if (index != -1) {
+            general.add(pool.getConstant(index));
+        }
+        
+        org.apache.bcel.classfile.Method[] methods= cg.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+    	    Set temp= new HashSet();
+    	    map.put(methods[i], temp);
+           	temp.add(pool.getConstant(methods[i].getNameIndex()));
+        	temp.add(pool.getConstant(methods[i].getSignatureIndex()));
+        	LocalVariableTable lvt= methods[i].getLocalVariableTable();
+        	if (lvt != null) {
+	        	LocalVariable[] lvs= lvt.getLocalVariableTable();
+	        	for (int j = 0; j < lvs.length; j++) {
+	                temp.add(pool.getConstant(lvs[j].getNameIndex()));
+	                temp.add(pool.getConstant(lvs[j].getSignatureIndex()));
+	            }
+        	}
+        	ExceptionTable et= methods[i].getExceptionTable();
+        	if (et != null) {
+        	    int[] eit= et.getExceptionIndexTable();
+        	    for (int j = 0; j < eit.length; j++) {
+        	        ConstantClass cc= (ConstantClass) pool.getConstant(eit[j]);
+        	        temp.add(cc);
+        	        temp.add(pool.getConstant(cc.getNameIndex()));
+                }
+        	}
+        	MethodGen mg= new MethodGen(methods[i],cg.getClassName(),  pool);
+        	CodeExceptionGen[] cges= mg.getExceptionHandlers();
+        	for (int j = 0; j < cges.length; j++) {
+                ConstantClass cc= (ConstantClass) pool.getConstant(cges[j].getCodeException(pool).getCatchType());
+                if (cc != null) {
+                    temp.add(cc);
+                    temp.add(pool.getConstant(cc.getNameIndex()));
+                }
+            }
+            if (!(methods[i].isAbstract() || methods[i].isNative())) {
+                //System.out.println(methods[i]);
+                //System.out.println(methods[i].getCode().getAttributes().length);
+	            InstructionList list= new InstructionList(methods[i].getCode().getCode());
+	            Instruction[] instructions= list.getInstructions();
+	            for (int j = 0; j < instructions.length; j++) {
+	                index= -1;
+//                    System.out.println(instructions[j].getClass());
+	                if (instructions[j] instanceof CPInstruction) {
+	                    CPInstruction cpi= (CPInstruction) instructions[j];
+	                    Constant constant= pool.getConstant(cpi.getIndex());
+	                    temp.add(constant);
+	                    //System.out.println(constant);
+	                    switch (constant.getTag()) {
+	                    case Constants.CONSTANT_InterfaceMethodref:
+	                    case Constants.CONSTANT_Methodref:
+	                    case Constants.CONSTANT_Fieldref:{
+	                        ConstantCP ccp= (ConstantCP) constant;
+	                        ConstantClass cc= (ConstantClass) pool.getConstant(ccp.getClassIndex());
+	                        temp.add(cc);
+	                        temp.add(pool.getConstant(cc.getNameIndex()));
+	                    	ConstantNameAndType cnt= (ConstantNameAndType) pool.getConstant(ccp.getNameAndTypeIndex());
+	                    	temp.add(cnt);
+	                    	temp.add(pool.getConstant(cnt.getNameIndex()));
+	                    	temp.add(pool.getConstant(cnt.getSignatureIndex()));
+	                    }
+                        break;
+                        case Constants.CONSTANT_Class: {
+    	                    ConstantClass cclass= (ConstantClass)constant;
+	                    	temp.add(pool.getConstant(cclass.getNameIndex()));
+                        }
+                        break;
+                        case Constants.CONSTANT_String:
+	                        ConstantString cs= (ConstantString) constant;
+                    		temp.add(pool.getConstant(cs.getStringIndex()));
+	                    default:
+	                        
+	                        break;
+	                    }
+	                }
+	            }
+            }
+        }
+        Field[] fields= cg.getFields();
+        for (int i = 0; i < fields.length; i++) {
+            //fields[i].getNameIndex()
+        }
+        for (int i = 0; i < CONSTANTS_IN_POOL.length; i++) {
+            index= pool.lookupUtf8(CONSTANTS_IN_POOL[i]) ; 
+            if (index != -1) {
+                general.add(pool.getConstant(index));
+            }
+        }
+        int x= pool.getSize();
+        int t= 0;
+        if (cg.getClassName().endsWith(".TextScanner")) {
+            //System.out.println(cg.getClassName());
+            //System.out.println(methods.length);
+        }
+        
+        for (int i = 0; i < x; i++) {
+            boolean used= false;
+            Constant constant= pool.getConstant(i);
+            if (constant == null) {
+//                System.out.println("ENTRUPOUOUOUPOUPOIUOIU");
+                continue;
+            }
+            for (int j = 0; j < methods.length; j++) {
+//        	    System.out.println("H2"+new Method(cg.getClassName(), methods[j]).hashCode());
+                Set constants= (Set)map.get(methods[j]);
+                if (constants.contains(constant)) {
+                    used= true;
+                    break;
+                }
+            }
+            if (i == 533) {
+                //System.out.println(pool.getConstant(532));
+                //System.out.println(constant);
+                //System.out.println(pool.getConstant(534));
+            }
+            if (!used && !general.contains(constant)) {
+                t++;
+                pool.setConstant(i, EMPTY);
+                switch (constant.getTag()) {
+            	case Constants.CONSTANT_Double:
+            	case Constants.CONSTANT_Long:
+            	case Constants.CONSTANT_Float: {
+            	    //System.out.println("DOOOOOOOOOOOOOOOOOOOOOOBLU");
+            	    pool.setConstant(i+1, EMPTY);
+            	    
+            	}
+                }
+                if (cg.getClassName().endsWith(".TextScanner")) {
+                    System.out.println("NÂO UTILIZADA:" + i+ ")" + constant);
+                }
+            }
+        }
+        if (cg.getClassName().endsWith(".TextScanner")) {
+          System.out.println("QUANTIDADE not util: " +t);
+          System.out.println(classname);
+        }
+    }
+    
+    Map map= new HashMap();
+    
+    static Constant EMPTY= new ConstantUtf8("");
+    
+    private static final String[] CONSTANTS_IN_POOL= {"Synthetic", "SourceFile", "Code", "LineNumberTable", "LocalVariableTable", "Exceptions", "this", "LocalVariables", "ConstantValue"};
     
 }

@@ -30,6 +30,7 @@ public class Method extends FieldOrMethod {
 		this(className, name, Utility.methodTypeToSignature(returnClass,
 				argumentClasses));
 	}
+	
 	/**
 	 *  
 	 */
@@ -88,4 +89,10 @@ public class Method extends FieldOrMethod {
 		super(className, name, signature);
 		// TODO Auto-generated constructor stub
 	}
+    /**
+     * @param method The method to set.
+     */
+    public void setMethod(MethodGen method) {
+        this.method = method;
+    }
 }

@@ -12,6 +12,16 @@
 		</fileset>
 	</programClasspath>
 	<inspect>
+		<class name="Teste1">
+			<method name="main">
+				<arguments>
+					<classType name="java.lang.String[]"/>
+				</arguments>
+				<return>
+					<void></void>
+				</return>
+			</method>
+		</class>
 		<class name="net.java.dev.jminimizer.JMinimizer">
 			<method name="main">
 				<arguments>
@@ -28,7 +38,7 @@
 				</arguments>
 			</constructor>
 		</class>
-		<class name="org.apache.commons.logging.impl.SimpleLog" >
+		<class name="org.apache.commons.logging.impl.Jdk14Logger" >
 			<constructor>
 				<arguments>
 					<classType name="java.lang.String"/>
