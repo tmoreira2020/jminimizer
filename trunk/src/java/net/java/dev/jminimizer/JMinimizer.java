@@ -38,7 +38,12 @@ public class JMinimizer {
             hf.printHelp("net.java.dev.jminimizer.JMinimizer", getOptions());
             System.exit(0);
         }
-		Configurator configurator= new XMLConfigurator((File)cl.getOptionObject('c'));
+        File file= (File)cl.getOptionObject('c');
+        if (!file.exists()) {
+        	System.out.println("Configuration file not found: " +file);
+        	System.exit(0);
+		}
+		Configurator configurator= new XMLConfigurator(file);
 		Repository repo= new URLRepository(configurator.getProgramClasspath(), configurator.getRuntimeClasspath());
 		System.out.println("Analysing...");
 		Analyser an= new Analyser(configurator, repo);

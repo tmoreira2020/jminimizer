@@ -9,8 +9,10 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -75,7 +77,7 @@ public class Transformer implements Visitor {
 	
 	private Set methodsThatUseClassForName;
 	
-	private ZipOutputStream out;
+	private JarOutputStream out;
 	
 	private Repository repository;
 	
@@ -98,7 +100,7 @@ public class Transformer implements Visitor {
 		this.classes = repository.getProgramClasses();
 		File output = configurator.getTransformationOutput();
 		if (output.isFile()) {
-			out = new ZipOutputStream(new FileOutputStream(output, false)) {
+			out = new JarOutputStream(new FileOutputStream(output, false)) {
 				
 				/**
 				 * @see java.util.zip.ZipOutputStream#close()
@@ -126,13 +128,6 @@ public class Transformer implements Visitor {
 		startPC= code.append(i);
 		i= factory.createInvoke("java.lang.Class", "forName", returnType, new Type[]{Type.STRING}, Constants.INVOKESTATIC);
 		InstructionHandle endPC =code.append(i);
-		/*int out = pool.addFieldref("java.lang.System", "out", "Ljava/io/PrintStream;");
-		 int println = pool.addMethodref("java.io.PrintStream", "println", "(Ljava/lang/String;)V");
-		 code.append(new GETSTATIC(out));
-		 code.append(new ALOAD(0));
-		 code.append(new INVOKEVIRTUAL(println));
-		 code.append(factory.createPrintln("FOIIIIII"));
-		 */
 		i= InstructionFactory.createReturn(returnType);
 		code.append(i);
 		i= InstructionFactory.createStore(Type.OBJECT, 1);
@@ -152,7 +147,6 @@ public class Transformer implements Visitor {
 		mg.setMaxStack();
 		mg.setMaxLocals();
 		int x= pool.addConstant(new ConstantUtf8("Synthetic"), pool);
-		mg.removeLineNumbers();
 		mg.addAttribute(new Synthetic(x, 0, null, pool.getConstantPool()));
 		return mg;
 	}
@@ -173,8 +167,7 @@ public class Transformer implements Visitor {
 			}
 			stream = new FileOutputStream(file);
 		} else {
-			ZipEntry entry = new ZipEntry(classFile);
-			out.putNextEntry(entry);
+			out.putNextEntry(new JarEntry(classFile));
 			stream = out;
 		}
 		log.debug("Dumping class: " + classFile);
@@ -194,22 +187,27 @@ public class Transformer implements Visitor {
                     String programClasspathString= programsClasspath[i].toString();
                     if (resourceString.startsWith(programClasspathString)) {
                         resourceString= resourceString.substring(programClasspathString.length());
+                        if (resourceString.equals("META-INF/MANIFEST.MF")) {
+                        	break;
+                        }
                         if (duplicateEntries.contains(resourceString)) {
                             log.warn("The entry "+ resourceString + " already exist. The file "+ resource.toString()+ " will not be adds to generated program!!!");
                             break;
                         }
                         duplicateEntries.add(resourceString);
-                        out.putNextEntry(new ZipEntry(resourceString));
+                        out.putNextEntry(new JarEntry(resourceString));
                         InputStream in = resource.openStream();
                         byte[] data= new byte[1024];
-                        while (in.read(data) != -1) {
-                            out.write(data);
+                        int lengthOfDataRead= 0;
+                        while ((lengthOfDataRead= in.read(data)) != -1) {
+                            out.write(data, 0, lengthOfDataRead);
                         }
                         in.close();
                         break;
                     }
                 }
 	        }
+		    this.writeManifest(out);
 			out.finish();
 		} else {
 		    while (iterator.hasNext()) {
@@ -219,6 +217,9 @@ public class Transformer implements Visitor {
                     String programClasspathString= programsClasspath[i].toString();
                     if (resourceString.startsWith(programClasspathString)) {
                         resourceString= resourceString.substring(programClasspathString.length());
+                        if (resourceString.equals("META-INF/MANIFEST.MF")) {
+                        	break;
+                        }
                         int lastIndex;
                         if (programClasspathString.startsWith("file:")) {
                             lastIndex= resourceString.lastIndexOf(File.separatorChar);
@@ -236,8 +237,9 @@ public class Transformer implements Visitor {
                         InputStream in = resource.openStream();
                         OutputStream out= new FileOutputStream(new File(directory, resourceString.substring(lastIndex+1)));
                         byte[] data= new byte[1024];
-                        while (in.read(data) != -1) {
-                            out.write(data);
+                        int lengthOfDataRead= 0;
+                        while ((lengthOfDataRead= in.read(data)) != -1) {
+                            out.write(data, 0, lengthOfDataRead);
                         }
                         in.close();
                         out.close();
@@ -245,7 +247,22 @@ public class Transformer implements Visitor {
                     }
                 }
 	        }
+		    File directory= new File(configurator.getTransformationOutput(), "META-INF");
+		    directory.mkdirs();
+		    File file= new File(directory, "MANIFEST.MF");
+		    FileOutputStream out= new FileOutputStream(file);
+		    this.writeManifest(out);
+		    out.close();
 		}
+	}
+	
+	private void writeManifest(OutputStream out) throws IOException {
+	    Manifest manifest= new Manifest();
+	    Attributes attributes= manifest.getMainAttributes();
+	    attributes.putValue("Manifest-Version", "1.0");
+	    //TODO put the version of actual JMinimizer
+	    attributes.putValue("Created-By", "JMinimizer alpha-2");
+	    manifest.write(out);
 	}
 	
 	/**
@@ -311,33 +328,26 @@ public class Transformer implements Visitor {
 		try {
 			code.delete(temp, end);
 		} catch (TargetLostException e) {
-			//System.out.println("ERRRRRO");
 			InstructionHandle[] targets = e.getTargets();
 			for(int d=0; d < targets.length; d++) {
 				InstructionTargeter[] targeters = targets[d].getTargeters();
 				for(int j=0; j < targeters.length; j++) {
 					if (targeters[j] instanceof CodeExceptionGen) {
 						method.removeExceptionHandler((CodeExceptionGen)targeters[j]);
-						//System.out.println("è CODEEXCPTIONGEN");  
 					}
 					if (targeters[j] instanceof LocalVariableGen) {
 						LocalVariableGen lvg= (LocalVariableGen) targeters[j];
-						//TODO
-						method.removeLocalVariable(lvg);
+						//method.removeLocalVariable(lvg);
 						LocalVariable lv= lvg.getLocalVariable(pool);
 						if (lv.getStartPC() == 0) {
 							lvg.setEnd(newEnd);
-							//lvg= method.addLocalVariable(lvg.getName(), lvg.getType(), lv.getNameIndex(), lvg.getStart(), newEnd);
 						} else {
 							method.removeLocalVariable(lvg);
 						}
 					}
-					//targeters[j].updateTarget(targets[d], code.getEnd());
 				}
 			}                
-			//e.printStackTrace();
 		}
-		//System.out.println(code);
 	}
 	
 	/**
@@ -350,10 +360,12 @@ public class Transformer implements Visitor {
 		Attribute[] attrs= method.getAttributes();
 		InstructionList code= method.getInstructionList();
 		InstructionHandle[] ins= code.getInstructionHandles();
+		boolean isCompilerArtificios= false;
 		//test if this method is Synthetic
 		for (int i = 0; i < attrs.length; i++) {
 			if (attrs[i] instanceof Synthetic && !method.getName().equals(SYNTHETIC_METHOD_NAME)) {
 				this.transformBySynthetic(method, pool, code);
+				isCompilerArtificios=true;
 			}
 		}
 		//test if this method has a sequence os instructions write by compiler
@@ -364,42 +376,19 @@ public class Transformer implements Visitor {
 					&& ins[j+3].getInstruction() instanceof POP
 					&& ins[j+4].getInstruction() instanceof LDC) {
 				this.transformByInstructionSequence(ins[j+5], ins[j+14], code, pool, method);
-				//TODO transformar este trecho de codigo em um método synthetic
+				isCompilerArtificios=true;
 			}
 		}
-		/*        LocalVariableTable lct= method.getLocalVariableTable(pool);
-		 if (lct.getLength() != 0) {
-		 LocalVariable[] lvs= lct.getLocalVariableTable();
-		 method.removeLocalVariables();
-		 for (int i = 0; i < lvs.length; i++) {
-		 LocalVariable lc= lct.getLocalVariable(i);
-		 System.out.println(lc);
-		 if (lc == null) {
-		 continue;
-		 }
-		 lc.setStartPC(0);
-		 method.addLocalVariable(lc.getName(), Type.getType(lc.getSignature()), code.getStart(), code.getEnd());
-		 }
-		 }
-		 */      return method.getMethod();
+		if (!isCompilerArtificios) {
+			log.warn("The method " + new Method(method.getClassName(), method.getName(), method.getSignature()) + " has a call to java.lang.Class.forName(java.lanag.String className)!!");
+		}
+		return method.getMethod();
 	}
 	
 	private void transformByInstructionSequence(InstructionHandle start, InstructionHandle end, InstructionList code, ConstantPoolGen pool, MethodGen method) throws TargetLostException {
 		InstructionHandle temp= start;
-		/*        while (temp != end) {
-		 if (temp.hasTargeters()) {
-		 InstructionTargeter[] tar=temp.getTargeters();
-		 for (int k = 0; k < tar.length; k++) {
-		 method.removeExceptionHandlers();
-		 temp.removeAllTargeters();
-		 }
-		 }
-		 temp= temp.getNext();
-		 }
-		 */
 		code.insert(start, this.buildInstructionListWithCallToNewMethod(pool, classThatContainsTheNewMethod));
 		temp= start.getNext().getNext().getNext();
-		//        System.out.println(temp);
 		try {
 			code.delete(temp, end);
 		} catch (TargetLostException e) {

@@ -130,7 +130,10 @@ public class Analyser {
     public void analyse(Method method, Set usedMethods)
             throws ClassNotFoundException {
         if (!usedMethods.contains(method)) {
-            classes.add(method.getClassName());
+            if (classes.add(method.getClassName())) {
+            	//used just to relax de user
+            	log.info("Analysing class: "+method.getClassName());
+            }
             usedMethods.add(method);
             MethodGen mg = method.toMethodGen();
             if (mg.isNative()) {
