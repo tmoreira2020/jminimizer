@@ -71,7 +71,7 @@ public class AnalyserTest extends TestCase {
 		URL[] program = new URL[]{new URL("file:target/test-classes/")};
 		URL[] runtime = new URL[]{};
 		Repository repo = new URLRepository(program, runtime);
-		return new Analyser(new XMLMethodInspector(AllTests.TEST_PATH + "xml"
-				+ File.separator + "AnalyserTest.xml", repo), repo);
+		return new Analyser(new XMLMethodInspector(new File(AllTests.TEST_PATH + "xml",
+				"AnalyserTest.xml"), repo), repo);
 	}
 }
