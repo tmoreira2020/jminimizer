@@ -1,5 +1,5 @@
 \chapter{Outras Ferramentas e trabalhos}
-Nas pesquisas que desenvolvi pude observar que muitos trabalhos já foram realizados na busca por uma diminuição das aplicações Java\cite{java}. Alguns propondo uma reestruturação do bytecode java \cite{tailored}, outros sugerindo uma compactação diferente para os arquivos JAR \cite{jar} \cite{jazz}, no entanto estes propoem mudanças estruturais muito porfundas, tanto nos arquivos class ou jars, tão profundas que só ferramentas especiais são capazes de ler estes tipos de arquivo. Porem também encontrei ferramentas que reduzem as aplicações Java sem modificar sua estrutura básica e assim, são perfeitamentes compatíveis com a especificação Java \cite{javaspec} entre elas estão o Jax\cite{jax},  SophiaCompression\cite{sophia} entre outras. A seguir serão descritas brevemente cada uma das ferramentas que estudei.
+Nas pesquisas desenvolvidas foi observado que muitos trabalhos já foram realizados na busca por uma diminuição das aplicações Java\cite{java}. Alguns propondo uma reestruturação do bytecode java \cite{tailored}, outros sugerindo uma compactação diferente para os arquivos JAR \cite{jar} \cite{jazz}, no entanto estes propoem mudanças estruturais muito porfundas, tanto nos arquivos class ou jars, tão profundas que só ferramentas especiais são capazes de ler estes tipos de arquivo. Porem também encontrei ferramentas que reduzem as aplicações Java sem modificar sua estrutura básica e assim, são perfeitamentes compatíveis com a especificação Java \cite{javaspec} entre elas estão o Jax\cite{jax},  SophiaCompression\cite{sophia} entre outras. A seguir serão descritas brevemente cada uma das ferramentas que estudei.
 
 \section{Obfuscadores}
 Obfuscadores são ferramentas de grande utilização na distribuição de aplicações Java eles não impedem, mas dificultam a engenharia reversa que consiste em a partir do arquivos class obter um arquivo fonte. Além de obfuscarem os arquivos class essas ferramentas tem como efeito colateral a diminuição da aplicação final, por isso foram objetos de pesquisa dessa tese. Isto ocorre devido a troca dos nomes das classes e pacotes por nomes mais simples e compactos por exemplo, a classe original com nome \textit{net.java.dev.jminimizer.JMinimizer} é renomeada para \textit{a.b.c.d.A}, isto impacta significativamente na diminuição dos arquivos class.
@@ -17,13 +17,31 @@ Algumas características:
 \item uma interface gráfica é provida para um simples gerenciamento de scripts.
 \item usa massivamente sobrecarga de nomes de métodos e campos para um aumento da segurança.
 \item gera unicamente bytecode Java verificado e completamente compatível com a especificação da máquina virtual Java.
-\item atualiza o arquivo Manifest dos arquivos JAR, utilizanbdo nomes obfuscados e automaticamente gerando menssagens sumário MD5 e SHA-1.
+\item atualiza o arquivo Manifest dos arquivos JAR, utilizando nomes obfuscados e automaticamente gerando menssagens sumário MD5 e SHA-1.
 \end{enumerate}
 
 \subsection{ProGuard}
 ProGuard é um otimizador e um obfuscador para bytecode Java. Ele pode detectar e remover classes, métodos, campos e atributos que não são usados. Também pode otimizar e remover instruções não usadas. Finalmente, ele renomeia classes, campos e métodos usando nomes curtos e sem sentido, resultando em arquivos JARs menores e de difícil execução de uma possível engenharia reversa.
 
 \section{Compactadores}
-\subsection{SophiaCompress}
+Os compactadores são ferramentas com o mesmo intuito desse projeto, diminuir o tamanho da aplicação final. Foram encontradas algumas técnicas de compressão de aplicações Java, muitas delas sugerindo novas estruturas tanto para arquivos class e como para JAR's, além de outras que não modificam 
+\subsection{SophiaCompress(Java)}
+SophiaCompress(Java) é um compactador de aplicações Java, desenvolvido especialmente para o profile MIDP\footnote{Mobile Information Device Profile} 1.0 de J2ME\footnote{Java 2 Micro Edition} atulamente está na versão 2.0 e é desenvolvido por uma empresa japonesa a Sophia Cradle\cite{sophia}, que além de produzir o SophiaCompress para Java também possui uma versão para Brew\cite{brew}. SophiaCompress não é um software livre e seu uso é licensiado através do pagamento de licensas. Uma característica importante relacionada a esse projeto é que as transformações feitas no código não violam nenhuma especificação da linguagem Java bem como da JSR\footnote{Java Specification Request} 37.
+Algumas das características que SophiaCompress possui:
+
+\begin{enumerate}
+\item Diminuição dos nomes de classes, métodos e campos.
+\item Compartilhamento de nomes de classes, métodos e campos.
+\item Substituição de conjunto de instruções por mais curtos.
+\item Inline de métodos.
+\item Remoção de classes, métodos e campos que não são utilizados, inclusive dados sobre estas estruturas do Constant Pool.
+\item Remoção de instruções não utilizadas.
+\item Fundição de classes
+\end{enumerate}
 \subsection{Jax}
+O principal interesse do projeto Jax é a redução do tamanho das aplicações Java visando a redução do tempo de sua obtenção. Jax lê num arquivo class que constitui a aplicação Java, e executa uma analise na aplicação inteira para determinar os componentes, isto é, classes, métodos e campos da aplicação que devem ser mantidos para preservar o comportamento da aplicação. A seguir Jax aplica diversas transformações visando a redução do tamanho na aplicação, e cria uma arquivo JAR contendo a aplicação reduzida. As transformações incorporadas no Jax, atualmente incluem: remoção de atributos redundantes como LocalVariable e LineNumber, remoção de métodos e campos não utilizados, inline de métodos, nos casos que há redução do tamanho da aplicação, transformação da hierarquia de classes e renomeação de pacotes, classes, métodos e campos. Para aplicações com mais de 2.300 classes foram medidos reduções de até 90\%, onde as grandes reduções, geralmente, ocorreram em aplicações baseadas em bibliotecas. Mas a média de redução observado é de 50\%.
+Quando este projeto foi elaborado o projeto Jax já havia sido incorporado pelo produto WebSphere Studio Device Developer\cite{wsdd} e não possui mas link para sua obtenção.
 \subsection{Jazz}
+O formato de arquivo Jazz\cite{jazz} pretende ser um substituto para o formato de arquivo JAR, quando for usado para armazenamento e distribuição de programas Java. Um arquivo Jazz possui uma compressão além do que é possível com um arquivo JAR. O tamanho reduzido do arquivo Jazz permite transmissões mais rápidas através da rede e ainda um benefício adicional de conservar espaço em disco. A compressão dos arquivos Jazz é obtidas através de uma combinação de diferentes métodos de compressão de dados, adaptados ao conjunto de características de uma coleção de classes Java. Apesar de a compressão ser maior dos arquivos Jazz, eles não seguem as especificações que um arquivo JAR segue, portanto só ferramentas ou JVM's especiais podem ler e descompactar um arquivo nesse formato. Atualmente esse formato de arquivo não é padrão para a tecnológia Java. Para se tornar padrão é necessário que toda a industria relacionada a tecnológia Java adote esse formato ou então que ferramentas e JVM's suportem os dois formatos. O primeiro passo para a incorporação desse formato na tecnológia Java é criar uma JSR no JCP\footnote{Java Community Process}, que é o orgão responsável pela padronização de tecnológias relacionadas à Java. Do contrário esse projeto permanecerá como uma pesquisa.
+
+
