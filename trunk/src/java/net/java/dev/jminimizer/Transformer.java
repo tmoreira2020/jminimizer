@@ -69,7 +69,9 @@ public class Transformer implements Visitor {
 	
 	public static final String SYNTHETIC_METHOD_NAME= "SYNTHETIC$JMINIMIZER";
 	
-	private Set classes;
+	private Set classesInProgramClasspath;
+	
+	private Set classesUseByProgram;
 	
 	private String classThatContainsTheNewMethod;
 	
@@ -97,7 +99,8 @@ public class Transformer implements Visitor {
 		this.repository = repository;
 		this.usedMethods = usedMethods;
 		this.methodsThatUseClassForName= methodsThatUseClassForName;
-		this.classes = repository.getProgramClasses();
+		this.classesInProgramClasspath = repository.getProgramClasses();
+		this.classesUseByProgram= new HashSet();
 		File output = configurator.getTransformationOutput();
 		if (output.isFile()) {
 			out = new JarOutputStream(new FileOutputStream(output, false)) {
@@ -207,6 +210,7 @@ public class Transformer implements Visitor {
                     }
                 }
 	        }
+		    out.putNextEntry(new JarEntry("META-INF/MANIFEST.MF"));
 		    this.writeManifest(out);
 			out.finish();
 		} else {
@@ -426,7 +430,8 @@ public class Transformer implements Visitor {
 	 * @see net.java.dev.jminimizer.util.Visitor#visit(net.java.dev.jminimizer.beans.Class)
 	 */
 	public void visit(String className) throws Exception {
-		if (classes.contains(className)) {
+		if (classesInProgramClasspath.contains(className)) {
+		    classesUseByProgram.add(className);
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 			.newDocument();
 			Element eClazz = document.createElement("class");
@@ -469,7 +474,8 @@ public class Transformer implements Visitor {
 				}
 			}
 			log.debug("Cleaning up the constant pool of class: "+ cg.getClassName());
-			javaClass= new ConstantPoolCleanerVisitor(configurator.isDeepStripment()).cleanUpClassGen(cg);
+			ConstantPoolCleanerVisitor visitor= new ConstantPoolCleanerVisitor(configurator.isDeepStripment(), classesUseByProgram);
+			javaClass= visitor.cleanUpClassGen(cg);
 			this.dump(javaClass);
 			if (eClazz.hasChildNodes()) {
 				File directory = configurator.getReportDirectory();

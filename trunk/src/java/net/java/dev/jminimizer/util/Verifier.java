@@ -1,4 +1,5 @@
 package net.java.dev.jminimizer.util;
+import java.io.File;
 import java.net.URL;
 
 import org.apache.bcel.Repository;
@@ -11,7 +12,14 @@ import org.apache.bcel.Repository;
 public class Verifier {
 
 	public static void main(String[] args) throws Exception {
-		Repository.setRepository(new URLRepository(new URL[]{new URL("file:"+args[0])}, new URL[0]));
+	    URL url;
+	    File file= new File(args[0]);
+	    if (file.isFile()) {
+	        url= new URL("jar:file:"+args[0]+"!/");
+	    } else {
+	        url= file.getAbsoluteFile().toURL();
+	    }
+		Repository.setRepository(new URLRepository(new URL[]{url}, new URL[0]));
 		String[] argsTemp=new String[args.length-1];
 		for (int i = 0; i < argsTemp.length; i++) {
 			argsTemp[i]= args[i+1];

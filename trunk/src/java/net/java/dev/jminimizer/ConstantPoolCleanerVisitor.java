@@ -1,5 +1,7 @@
 package net.java.dev.jminimizer;
 
+import java.util.Set;
+
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Attribute;
 import org.apache.bcel.classfile.Code;
@@ -51,10 +53,12 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
     private static final Log log = LogFactory.getLog(ConstantPoolCleanerVisitor.class);
     private ConstantPoolGen newPool;
     private ConstantPoolGen oldPool;
+    private Set classesUsedByProgram;
     private boolean deepStripment;
     
-    public ConstantPoolCleanerVisitor(boolean deepStripment) {
+    public ConstantPoolCleanerVisitor(boolean deepStripment, Set classesUsedByProgram) {
         newPool= new ConstantPoolGen();
+        this.classesUsedByProgram= classesUsedByProgram;
         this.deepStripment= deepStripment;
     }
 
@@ -220,18 +224,18 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
      */
     public void visitInnerClass(InnerClass obj) {
     	log.debug("Visiting innerClass");
-        int index= newPool.addConstant(oldPool.getConstant(obj.getInnerClassIndex()), oldPool);
-        obj.setInnerClassIndex(index);
-        index= obj.getInnerNameIndex();
-        if (index != 0) {
-	        index= newPool.addConstant(oldPool.getConstant(index), oldPool);
-	        obj.setInnerNameIndex(index);
-        }
-        index= obj.getOuterClassIndex();
-        if (index != 0) {
-	        index= newPool.addConstant(oldPool.getConstant(index), oldPool);
-	        obj.setOuterClassIndex(index);
-        }
+    	String className= ((ConstantClass)oldPool.getConstant(obj.getInnerClassIndex())).getBytes(oldPool.getConstantPool()).replace('/', '.');
+	    if (classesUsedByProgram.contains(className)) {
+            newPool.addConstant(oldPool.getConstant(obj.getInnerClassIndex()), oldPool);
+            int index= obj.getInnerNameIndex();
+            if (index != 0) {
+    	        newPool.addConstant(oldPool.getConstant(index), oldPool);
+            }
+            index= obj.getOuterClassIndex();
+            if (index != 0) {
+    	        newPool.addConstant(oldPool.getConstant(index), oldPool);
+            }
+    	}
     }
 
     /**
@@ -239,12 +243,15 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
      */
     public void visitInnerClasses(InnerClasses obj) {
     	log.debug("Visiting innerClasses");
-        obj.setNameIndex(newPool.addUtf8(Constants.ATTRIBUTE_NAMES[Constants.ATTR_INNER_CLASSES]));
+    	int size= newPool.getSize();
         InnerClass[] innerClasss=obj.getInnerClasses();
         for (int i = 0; i < innerClasss.length; i++) {
             innerClasss[i].accept(this);
         }
-        obj.setConstantPool(newPool.getConstantPool());
+        if (size != newPool.getSize()) {
+            obj.setNameIndex(newPool.addUtf8(Constants.ATTRIBUTE_NAMES[Constants.ATTR_INNER_CLASSES]));
+            obj.setConstantPool(newPool.getConstantPool());
+        }
     }
 
     /**
@@ -372,8 +379,6 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
         	} else {
 	            MethodGen methodGen= new MethodGen(methods[i], className, oldPool);
 	            methodGen= methodGen.copy(className, newPool);
-				methodGen.addCodeAttribute(methodGen.getLineNumberTable(newPool));
-				methodGen.addCodeAttribute(methodGen.getLocalVariableTable(newPool));
 	            if (deepStripment) {
 		            methodGen.stripAttributes(deepStripment);
 					attributes= methodGen.getAttributes();
