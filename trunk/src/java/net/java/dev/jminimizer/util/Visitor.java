@@ -1,7 +1,6 @@
 package net.java.dev.jminimizer.util;
 
-import net.java.dev.jminimizer.beans.Field;
-import net.java.dev.jminimizer.beans.Method;
+import net.java.dev.jminimizer.beans.Class;
 
 
 /**
@@ -10,8 +9,6 @@ import net.java.dev.jminimizer.beans.Method;
  */
 public interface Visitor {
 	
-	public void visit(Method method);
+	public void visit(Class clazz);
 	
-	public void visit(Field field);
-
 }

@@ -13,9 +13,10 @@ public class Main {
 	private static final Log log = LogFactory.getLog(Main.class);
 
 	public static void main(String[] args) {
-		Worker w= new EnglishTeacher(null);
+		Worker w= new Teacher(null);
 		w.getName();
 		w.getSalary();
+		w.getJob();
 	}
 
 }
