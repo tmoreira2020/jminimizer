@@ -19,4 +19,11 @@ public class DisplayVisitor implements Visitor {
 		System.out.println();
 		System.out.println();
 	}
+	
+	/**
+     * @see net.java.dev.jminimizer.util.Visitor#finish()
+     */
+    public void finish() throws Exception {
+        System.out.println("DisplayVisitor.finish");
+    }
 }

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class URLRepository implements Repository {
 	private Map programClasses;
 	private URLClassLoader rc;
 	private Map runtimeClasses;
+	private Set programResources;
 	/**
 	 * @param parent
 	 */
@@ -41,6 +43,7 @@ public class URLRepository implements Repository {
 		this.rc = new URLClassLoader(runtime);
 		this.pc = program;
 		programClasses = new HashMap();
+		programResources= new HashSet();
 		runtimeClasses = new HashMap();
 	}
 	/**
@@ -48,6 +51,7 @@ public class URLRepository implements Repository {
 	 */
 	public void clear() {
 		programClasses.clear();
+		programResources.clear();
 		runtimeClasses.clear();
 	}
 	/**
@@ -63,7 +67,7 @@ public class URLRepository implements Repository {
 	/**
 	 *  
 	 */
-	private List findClassFromDirectory(File directory) {
+	private List findClassFromDirectory(File directory) throws MalformedURLException {
 		List list = new LinkedList();
 		if (directory.exists()) {
 			File[] files = directory.listFiles();
@@ -73,6 +77,8 @@ public class URLRepository implements Repository {
 				} else {
 					if (files[i].getName().endsWith(".class")) {
 						list.add(files[i]);
+					} else {
+				        programResources.add(files[i].toURL());
 					}
 				}
 			}
@@ -91,6 +97,10 @@ public class URLRepository implements Repository {
 			JarEntry entry = (JarEntry) e.nextElement();
 			if (entry.getName().endsWith(".class")) {
 				list.add(entry);
+			} else {
+			    if (!entry.isDirectory()) {
+			        programResources.add(new URL(jar, entry.getName()));
+			    }
 			}
 		}
 		return list;
@@ -142,28 +152,28 @@ public class URLRepository implements Repository {
 		return jc;
 	}
 	/**
-	 * 
-	 * @param directory
-	 */
-	private void loadClassFromDirectory(File directory) {
-		List classes = this.findClassFromDirectory(directory);
-		Iterator i = classes.iterator();
-		int start = directory.getAbsolutePath().length();
-		while (i.hasNext()) {
-			File file = (File) i.next();
-			//extract the directory
-			String clazz = file.getAbsolutePath().substring(start + 1);
-			clazz = this.normalizeClass(clazz);
-			try {
-				if (!programClasses.containsKey(clazz)) {
-					programClasses.put(clazz, this.parseClass(
-							new FileInputStream(file), clazz));
-				}
-			} catch (IOException e) {
-				//never here
-			}
-		}
-	}
+     * 
+     * @param directory
+     */
+    private void loadClassFromDirectory(File directory) {
+        try {
+            List classes = this.findClassFromDirectory(directory);
+            Iterator i = classes.iterator();
+            int start = directory.getAbsolutePath().length();
+            while (i.hasNext()) {
+                File file = (File) i.next();
+                //extract the directory
+                String clazz = file.getAbsolutePath().substring(start + 1);
+                clazz = this.normalizeClass(clazz);
+                if (!programClasses.containsKey(clazz)) {
+                    programClasses.put(clazz, this.parseClass(
+                            new FileInputStream(file), clazz));
+                }
+            }
+        } catch (IOException e) {
+            log.error("Never should be here!!!", e);
+        }
+    }
 	/**
 	 * 
 	 * @param jar
@@ -181,7 +191,7 @@ public class URLRepository implements Repository {
 				}
 			}
 		} catch (IOException e) {
-			//never here
+            log.error("Never should be here!!!", e);
 		}
 	}
 	/**
@@ -281,4 +291,10 @@ public class URLRepository implements Repository {
 	public void storeClass(JavaClass clazz) {
 		throw new RuntimeException("No sense in this class!!");
 	}
+    /**
+     * @see net.java.dev.jminimizer.util.Repository#getProgramResources()
+     */
+    public Set getProgramResources() {
+        return programResources;
+    }
 }

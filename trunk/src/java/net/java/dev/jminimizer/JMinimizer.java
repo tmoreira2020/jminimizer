@@ -6,6 +6,7 @@ import java.util.Set;
 import net.java.dev.jminimizer.util.Configurator;
 import net.java.dev.jminimizer.util.Repository;
 import net.java.dev.jminimizer.util.URLRepository;
+import net.java.dev.jminimizer.util.Visitor;
 import net.java.dev.jminimizer.util.XMLConfigurator;
 
 import org.apache.commons.cli.BasicParser;
@@ -45,7 +46,7 @@ public class JMinimizer {
 		an.analyse(configurator.getMethodsToInspect(), usedMethods);
 		System.out.println("Transforming...");
 		Set methodsThatUseClassForName= an.getMethodsThatUseClassForName();
-		Transformer visitor= new Transformer(configurator, repo, usedMethods, methodsThatUseClassForName);
+		Visitor visitor= new Transformer(configurator, repo, usedMethods, methodsThatUseClassForName);
 		an.receiveVisitor(visitor);
 		visitor.finish();
 	}
