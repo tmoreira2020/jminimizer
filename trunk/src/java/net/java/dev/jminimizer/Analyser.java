@@ -10,14 +10,13 @@ import java.util.Set;
 import net.java.dev.jminimizer.beans.Field;
 import net.java.dev.jminimizer.beans.Method;
 import net.java.dev.jminimizer.util.ClassUtils;
-import net.java.dev.jminimizer.util.InstructionSet;
 import net.java.dev.jminimizer.util.Configurator;
+import net.java.dev.jminimizer.util.InstructionSet;
 import net.java.dev.jminimizer.util.Visitor;
 
 import org.apache.bcel.Constants;
 import org.apache.bcel.Repository;
 import org.apache.bcel.classfile.Attribute;
-import org.apache.bcel.classfile.Code;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Synthetic;
 import org.apache.bcel.generic.ClassGen;
@@ -52,7 +51,7 @@ public class Analyser {
 
     protected Set classes;
 
-    protected Set runtimeClassLoaderMethods;
+    public static Set runtimeClassLoaderMethods;
 
     /**
      * @param inspecter
@@ -89,7 +88,7 @@ public class Analyser {
             notProcessedMethods.clear();
             this.analyse(methods, usedMethods);
         }
-        System.out.println(runtimeClassLoaderMethods.size());
+        //System.out.println(runtimeClassLoaderMethods.size());
     }
     
     private void proc(Method method) {
@@ -98,24 +97,12 @@ public class Analyser {
                 Attribute[] a= mg.getAttributes();
                 for (int i = 0; i < a.length; i++) {
                     if (a[i] instanceof Synthetic) {
-                        System.out.println(method.getClassName());
                         return;
                     }
                 }
                 log.warn(method);
                 runtimeClassLoaderMethods.add(method);
-                InstructionList list= mg.getInstructionList();
-                Instruction[] ins= list.getInstructions();
-                for (int j = 0; j < ins.length; j++) {
-                    if (ins[j] instanceof GETSTATIC 
-                            && ins[j+1] instanceof DUP
-                            && ins[j+2] instanceof IFNONNULL
-                            && ins[j+3] instanceof POP) {
-                        System.out.println(ins[j+5].toString(mg.getConstantPool().getConstantPool()));
-                    }
-                }
-                System.out.println();
-            } catch (ClassNotFoundException e) {
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -129,9 +116,9 @@ public class Analyser {
     private void analyseOverridedMethods(Set methods)
             throws ClassNotFoundException {
         String[] cls = (String[]) classes.toArray(new String[0]);
-        System.out.println("Free: "+ Runtime.getRuntime().freeMemory());
+        //System.out.println("Free: "+ Runtime.getRuntime().freeMemory());
         System.gc();
-        System.out.println("Free: "+ Runtime.getRuntime().freeMemory());
+        //System.out.println("Free: "+ Runtime.getRuntime().freeMemory());
         for (int i = 0; i < cls.length; i++) {
             this.analyseOverridedMethods(cls[i], methods);
         }
