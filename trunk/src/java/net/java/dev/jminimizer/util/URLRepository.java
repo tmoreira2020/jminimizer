@@ -76,7 +76,14 @@ public class URLRepository implements Repository {
 					list.addAll(this.findClassFromDirectory(files[i]));
 				} else {
 					if (files[i].getName().endsWith(".class")) {
-						list.add(files[i]);
+					    //this is used to get classes that is compiled to be a STUB
+					    if (files[i].getName().endsWith("_Stub.class")) {
+					        //this is a resource and don't have to be processed
+					        log.warn("Stubs: "+files[i]);
+					        programResources.add(files[i].toURL());
+		                } else {
+							list.add(files[i]);
+		                }
 					} else {
 				        programResources.add(files[i].toURL());
 					}
@@ -96,7 +103,14 @@ public class URLRepository implements Repository {
 		while (e.hasMoreElements()) {
 			JarEntry entry = (JarEntry) e.nextElement();
 			if (entry.getName().endsWith(".class")) {
-				list.add(entry);
+			    //this is used to get classes that is compiled to be a STUB
+			    if (entry.getName().endsWith("_Stub.class")) {
+			        //this is a resource and don't have to be processed
+			        log.warn("Stubs: "+entry);
+			        programResources.add(new URL(jar, entry.getName()));
+                } else {
+    				list.add(entry);
+                }
 			} else {
 			    if (!entry.isDirectory()) {
 			        programResources.add(new URL(jar, entry.getName()));

@@ -26,7 +26,9 @@ import org.apache.bcel.generic.FieldInstruction;
 import org.apache.bcel.generic.Instruction;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InvokeInstruction;
+import org.apache.bcel.generic.LoadClass;
 import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.ObjectType;
 import org.apache.bcel.util.InstructionFinder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +46,7 @@ public class Analyser {
 
     protected Set classes;
 
-    protected Configurator inspecter;
+    protected Configurator configurator;
 
     protected Set methodsThatUseClassForName;
 
@@ -53,15 +55,15 @@ public class Analyser {
     protected net.java.dev.jminimizer.util.Repository repository;
 
     /**
-     * @param inspecter
+     * @param configurator
      * @param repository
      * @throws ClassNotFoundException
      */
-    public Analyser(Configurator inspecter,
+    public Analyser(Configurator configurator,
             net.java.dev.jminimizer.util.Repository repository)
             throws ClassNotFoundException {
         super();
-        this.inspecter = inspecter;
+        this.configurator = configurator;
         this.repository = repository;
         this.notProcessedMethods = new HashSet();
         this.classes = new TreeSet(Collections.reverseOrder());
@@ -132,44 +134,75 @@ public class Analyser {
     public void analyse(Method method, Set usedMethods)
             throws ClassNotFoundException {
         if (!usedMethods.contains(method)) {
-            if (classes.add(method.getClassName())) {
+            String className= method.getClassName(); 
+            if (configurator.inspect(className) && classes.add(className)) {
             	//used just to relax de user
             	log.info("Analysing class: "+method.getClassName());
             }
             usedMethods.add(method);
-            MethodGen mg = method.toMethodGen();
-            if (mg.isNative()) {
+            MethodGen methodGen = method.toMethodGen();
+            if (methodGen.isNative()) {
             	log.trace("Native method: "+ method.toString());
                 return;
             }
-            if (mg.isAbstract()) {
+            if (methodGen.isAbstract()) {
             	log.trace("Abstract method: "+ method.toString());
             	return;
             }
-            Instruction[] instructions = this.findInvokeInstructions(mg);
-            ConstantPoolGen pool = mg.getConstantPool();
-            Method[] ms = this.instructionToMethod(
-                    (InvokeInstruction[]) instructions, pool);
-            for (int i = 0; i < ms.length; i++) {
-                if (ms[i].getName().equals("forName")
-                        && ms[i].getClassName().equals("java.lang.Class")) {
-                    this.analiseMethodThatUseClassForName(method);
-                }
-                // test with this method should be analyse
-                if (inspecter.inspect(ms[i])) {
-                    this.analyse(ms[i], usedMethods);
+            LoadClass[] loadClasses= this.findLoadClassInstructions(methodGen);  
+            ConstantPoolGen pool = methodGen.getConstantPool();
+            for (int i = 0; i < loadClasses.length; i++) {
+                if (loadClasses[i] instanceof InvokeInstruction) {
+                    InvokeInstruction instruction= (InvokeInstruction) loadClasses[i];
+                    Method methodTemp= new Method(instruction.getClassName(pool),
+                            instruction.getName(pool), instruction.getSignature(pool));
+                    if (usedMethods.contains(methodTemp)) {
+                        continue;
+                    }
+                    methodTemp= ClassUtils.findMethod(configurator, classes, instruction.getClassName(pool),
+                            instruction.getName(pool), instruction.getSignature(pool));
+                    if (methodTemp.getName().equals("forName")
+                            && methodTemp.getClassName().equals("java.lang.Class")) {
+                        this.analiseMethodThatUseClassForName(method);
+                    }
+                    // test if this method should be analyse
+                    if (configurator.inspect(methodTemp)) {
+                        this.analyse(methodTemp, usedMethods);
+                    } else {
+                        usedMethods.add(methodTemp);
+                    }
+                } else if (loadClasses[i] instanceof FieldInstruction) {
+                    FieldInstruction fieldInstruction = (FieldInstruction) loadClasses[i];
+                    className = fieldInstruction.getClassName(pool);
+                    usedMethods.add(new Field(className, fieldInstruction.getName(pool), fieldInstruction.getSignature(pool)));
+                    this.buildHierachyTree(className);
                 } else {
-                    usedMethods.add(ms[i]);
+                    ObjectType objectType= loadClasses[i].getLoadClassType(pool);
+                    //used to cacth casts from object to array of primitive types (int[], char[] long[])
+                    if (objectType != null) {
+                        className= objectType.getClassName();
+                        //used to cacth new, multinewarray, checkcast and instanceof
+                        this.buildHierachyTree(className);
+                    }
                 }
             }
-            instructions = this.findFieldInstructions(mg);
-            // Look up for use of fields. 
-            for (int i = 0; i < instructions.length; i++) {
-                FieldInstruction fi = (FieldInstruction) instructions[i];
-                String className = fi.getClassName(pool);
-                usedMethods.add(new Field(className, fi.getName(pool), fi
-                        .getSignature(pool)));
-                classes.add(className);
+        }
+    }
+    
+    private void buildHierachyTree(String className) throws ClassNotFoundException  {
+        if (configurator.inspect(className) && classes.add(className)) {
+        	//used just to relax de user
+        	log.info("Analysing class: "+className);
+            JavaClass javaClass= repository.loadClass(className);
+            JavaClass superJavaClass= javaClass.getSuperClass();
+            while (superJavaClass != null) {
+                className= superJavaClass.getClassName();
+                superJavaClass= superJavaClass.getSuperClass();
+                this.buildHierachyTree(className);
+            }
+            String[] javaClasses= javaClass.getInterfaceNames();
+            for (int i = 0; i < javaClasses.length; i++) {
+                this.buildHierachyTree(javaClasses[i]);
             }
         }
     }
@@ -218,12 +251,12 @@ public class Analyser {
         List methods = new ArrayList(Arrays.asList(jc.getMethods()));
         int size = methods.size();
         JavaClass superClass = jc.getSuperClass();
-        while (superClass != null && methods.size() != 0 && inspecter.inspect(className)) {
+        while (superClass != null && methods.size() != 0 && configurator.inspect(className)) {
             this.analiseMethodFromSuperClass(methods, superClass, className, usedMethods);
             superClass = superClass.getSuperClass();
         }
         JavaClass[] is = jc.getAllInterfaces();
-        for (int i = 0; i < is.length && methods.size() != 0 && inspecter.inspect(className); i++) {
+        for (int i = 0; i < is.length && methods.size() != 0 && configurator.inspect(className); i++) {
             this.analiseMethodFromSuperClass(methods, is[i], className, usedMethods);
         }
 
@@ -233,21 +266,11 @@ public class Analyser {
      * @param method
      * @return
      */
-    private FieldInstruction[] findFieldInstructions(MethodGen method) {
-        return (FieldInstruction[]) this.findInstructions(method,
-                "FieldInstruction").toArray(new FieldInstruction[0]);
-    }
-
-    /**
-     * @param method
-     * @param instructionPattern
-     * @return
-     */
-    private Set findInstructions(MethodGen method, String instructionPattern) {
+    private LoadClass[] findLoadClassInstructions(MethodGen method) {
         Set instructions = new InstructionSet();
         InstructionFinder finder = new InstructionFinder(method
                 .getInstructionList());
-        Iterator i = finder.search(instructionPattern);
+        Iterator i = finder.search("LoadClass");
         while (i.hasNext()) {
             InstructionHandle[] ih = (InstructionHandle[]) i.next();
             if (ih.length != 1) {
@@ -257,49 +280,14 @@ public class Analyser {
                 instructions.add(instruction);
             }
         }
-        return instructions;
+        return (LoadClass[]) instructions.toArray(new LoadClass[0]);
     }
 
-    /**
-     * @param method
-     * @param instructionPattern
-     * @return
-     */
-    private InvokeInstruction[] findInvokeInstructions(MethodGen method) {
-        return (InvokeInstruction[]) this.findInstructions(method,
-                "InvokeInstruction").toArray(new InvokeInstruction[0]);
-    }
     /**
      * @return Returns the methodsThatUseClassForName.
      */
     public Set getMethodsThatUseClassForName() {
         return methodsThatUseClassForName;
-    }
-
-    /**
-     * @param instructions
-     * @param pool
-     * @return @throws
-     *         ClassNotFoundException
-     */
-    private Method[] instructionToMethod(InvokeInstruction[] instructions,
-            ConstantPoolGen pool) throws ClassNotFoundException {
-        Set methods = new HashSet();
-        for (int i = 0; i < instructions.length; i++) {
-            String className= instructions[i].getClassName(pool);
-            Method method = ClassUtils.findMethod(inspecter, classes,
-                    instructions[i]
-                                    .getClassName(pool), instructions[i].getName(pool), instructions[i].getSignature(pool));
-            if (method == null) {
-            	method= new Method(instructions[i].getClassName(pool), 
-            			instructions[i].getName(pool),
-						instructions[i].getSignature(pool));
-            	throw new RuntimeException("Method not find: " + method);
-            } else {
-                methods.add(method);
-            }
-        }
-        return (Method[]) methods.toArray(new Method[0]);
     }
 
     /**
