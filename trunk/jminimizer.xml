@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE configuration SYSTEM "./resources/configuration.dtd" >
+    <configuration>
+    <inspect>
+        <class name="net.java.dev.jminimizer.JMinimizer" knowTime="compiletime">
+            <method name="main">
+                <arguments>
+                    <classType name="java.lang.String[]"/>
+                </arguments>
+                <return>
+                	<void></void>
+                </return>
+            </method>
+        </class>
+		<class name="org.apache.commons.logging.impl.LogFactoryImpl" knowTime="runtime">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class name="org.apache.commons.logging.impl.SimpleLog" knowTime="runtime">
+			<constructor>
+				<arguments>
+					<classType name="java.lang.String"/>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.GETSTATIC">
+			<constructor>
+				<arguments>					
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.ALOAD">
+			<constructor>
+				<arguments>					
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.NEW">
+			<constructor>
+				<arguments>					
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.FLOAD">
+			<constructor>
+				<arguments>					
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.ASTORE">
+			<constructor>
+				<arguments>					
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.INVOKESPECIAL">
+			<constructor>
+				<arguments>					
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.DLOAD">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.INVOKESTATIC">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.ILOAD">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.INVOKEINTERFACE">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.GOTO">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.LDC">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.INVOKEVIRTUAL">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+		<class knowTime="runtime" name="org.apache.bcel.generic.BIPUSH">
+			<constructor>
+				<arguments>
+				</arguments>
+			</constructor>
+		</class>
+    </inspect>
+    <notInspect>
+    	<pattern>
+    		java*
+    	</pattern>
+    </notInspect>
+</configuration>

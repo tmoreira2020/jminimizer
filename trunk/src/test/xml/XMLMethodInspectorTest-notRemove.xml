@@ -1,36 +1,21 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-    <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="configuration.xsd">
-    <notRemove>
-        <class name="java.lang.String"/>
-        <class name="dummy.Person">
-            <method name="getJob" inSubClasses="true">
-                <arguments/>
-                <return>
-                	<classType name="java.lang.String"/>
-                </return>
-            </method>
-        </class>
-        <class name="dummy.Worker">
-            <method name="getSalary" inSubClasses="true">
-                <arguments/>
-                <return>
-                	<primitiveType name="int"/>
-                </return>
-            </method>
-        </class>
-        <class name="dummy.Person">
-            <method name="getName">
-                <arguments/>
-                <return>
-                	<classType name="java.lang.String"/>
-                </return>
-            </method>
-        </class>
-        <class name="java.lang.Object">
-            <constructor>
-                <arguments/>
-            </constructor >
-        </class>
-        <pattern>org.w3c.dom.*</pattern>
-    </notRemove>
+<!DOCTYPE configuration SYSTEM "../../../resources/configuration.dtd" >
+<configuration>
+	<inspect>
+		<class knowTime="compiletime" name="dummy.Teacher">
+			<method name="getJob">
+				<arguments>
+				</arguments>
+				<return>
+					<classType name="java.lang.String"/>
+				</return>
+			</method>
+		</class>
+	</inspect>
+	<notInspect>
+		<pattern>java*</pattern>
+	</notInspect>
+	<notRemove>
+		<pattern>org.w3c.dom.*</pattern>
+	</notRemove>
 </configuration>

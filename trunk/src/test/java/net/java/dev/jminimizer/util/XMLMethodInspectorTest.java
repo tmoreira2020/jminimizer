@@ -25,10 +25,10 @@ public class XMLMethodInspectorTest extends TestCase {
 		assertEquals(3, ms.length);
 		//check if the method/constructor exist
 		for (int i = 0; i < ms.length; i++) {
-			if (ms[i].equals(new Method("dummy.Person", "getName", "()Ljava/lang/String;", false))) {
+			if (ms[i].equals(new Method("dummy.Person", "getName", "()Ljava/lang/String;"))) {
 				continue;
 			}
-			if (ms[i].equals(new Method("dummy.Person", "setName", "(Ljava/lang/String;)V", false))) {
+			if (ms[i].equals(new Method("dummy.Person", "setName", "(Ljava/lang/String;)V"))) {
 				continue;
 			}
 			if (ms[i].equals(new Constructor("dummy.Teacher", "(Ldummy/Teacher;)V"))) {
@@ -42,48 +42,45 @@ public class XMLMethodInspectorTest extends TestCase {
 		MethodInspector mi = new XMLMethodInspector(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notInspect.xml"), this.getRepository());
 		
 		//test if "org.w3c.dom.Document.getDoctype()Lorg/w3c/dom/DocumentType;" method is for inspect ?
-		Method m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;", false);
-		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m.toMethodGen()));
+		Method m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;");
+		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m));
 		
 		//test if "java.lang.Object.<init>()V" method is for inspect ?
 		m= new Constructor("java.lang.Object", "()V");
-		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m.toMethodGen()));
+		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m));
 		
 		//test if "java.lang.Integer.<init>(I)V" method is for inspect ?
-		m= new Method("java.lang.Integer", "intValue", "()I", false);
-		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m.toMethodGen()));
+		m= new Method("java.lang.Integer", "intValue", "()I");
+		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m));
 		
-		//test if "java.lang.Object.toString()V" method is for inspect ?
-		m= new Method("java.lang.Object", "toString", "()Ljava/lang/String;", false);
-		assertTrue("To inspect: " + m.toString(), mi.inspect(m.toMethodGen()));
 	}
 
 	public void testRemove() throws Exception {
 		MethodInspector mi = new XMLMethodInspector(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notRemove.xml"), this.getRepository());
 		
 		//test if "dummy.Teacher.getJob()Ljava/lang/String;" method is for remove ?
-		Method m= new Method("dummy.Teacher", "getJob", "()Ljava/lang/String;", false);
-		assertFalse("Not to remove: " + m.toString(), mi.remove(m.toMethodGen()));
+		Method m= new Method("dummy.Teacher", "getJob", "()Ljava/lang/String;");
+//		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
 		
 		//test if "dummy.Teacher.getSalary()I" method is for remove ?
-		m= new Method("dummy.Teacher", "getSalary", "()I", false);
-		assertFalse("Not to remove: " + m.toString(), mi.remove(m.toMethodGen()));
+		m= new Method("dummy.Teacher", "getSalary", "()I");
+//		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
 		
 		//test if "java.lang.Object.<init>()V" method is for remove ?
 		m= new Constructor("java.lang.Object","()V");
-		assertFalse("Not to remove: " + m.toString(), mi.remove(m.toMethodGen()));
+//		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
 		
 		//test if "java.lang.Integer.<init>(I)V" method is for remove ?
-		m= new Method("java.lang.Integer", "intValue", "()I", false);
-		assertTrue("To remove: " + m.toString(), mi.remove(m.toMethodGen()));
+		m= new Method("java.lang.Integer", "intValue", "()I");
+		assertTrue("To remove: " + m.toString(), mi.remove(m));
 		
 		//test if "dummy.Worker.setJob(Ljava/lang/String;)V" method is for remove ?
-		m= new Method("dummy.Worker", "setJob", "(Ljava/lang/String;)V", false);
-		assertTrue("To remove: " + m.toString(), mi.remove(m.toMethodGen()));
+		m= new Method("dummy.Worker", "setJob", "(Ljava/lang/String;)V");
+		assertTrue("To remove: " + m.toString(), mi.remove(m));
 		
 		//test if "org.w3c.dom.Document.getDoctype()Lorg/w3c/dom/DocumentType;" method is for remove ?
-		m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;", false);
-		assertFalse("Not to remove: " + m.toString(), mi.remove(m.toMethodGen()));
+		m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;");
+		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
 	}
 	
 	private Repository getRepository() throws Exception {

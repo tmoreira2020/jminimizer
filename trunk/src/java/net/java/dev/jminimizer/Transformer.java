@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import net.java.dev.jminimizer.beans.Class;
+import net.java.dev.jminimizer.util.MethodInspector;
 import net.java.dev.jminimizer.util.Repository;
 import net.java.dev.jminimizer.util.Visitor;
 
@@ -18,14 +19,17 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Transformer implements Visitor {
 	private static final Log log = LogFactory.getLog(Transformer.class);
-	private net.java.dev.jminimizer.util.Repository repo;
+	private MethodInspector mi;
+	private Repository repo;
+	
 	private File directory;
 	private Set classes;
 	/**
 	 *  
 	 */
-	public Transformer(Repository repo, File directory) {
+	public Transformer(MethodInspector mi, Repository repo, File directory) {
 		super();
+		this.mi= mi;
 		this.repo= repo;
 		this.directory= directory;
 		this.classes= repo.getProgramClasses();
@@ -37,25 +41,28 @@ public class Transformer implements Visitor {
         String className = clazz.getName();
         if (classes.contains(className)) {
             JavaClass jc = repo.findClass(className);
-            org.apache.bcel.classfile.Method[] ms = jc.getMethods();
-            log.debug("Cleaning class: " + className);
-            ClassGen cg = new ClassGen(jc);
-            for (int i = 0; i < ms.length; i++) {
-                if (!clazz.containsMethod(ms[i].getName(), ms[i]
-                        .getSignature())) {
-                    log.debug("Removing method: " + ms[i]);
-                    cg.removeMethod(ms[i]);
+        	ClassGen cg = new ClassGen(jc);
+            if (className.indexOf("$") == -1) {
+                org.apache.bcel.classfile.Method[] ms = jc.getMethods();
+                log.debug("Cleaning class: " + className);
+                for (int i = 0; i < ms.length; i++) {
+                    if (!clazz.containsMethod(ms[i].getName(), ms[i]
+                            .getSignature())) {
+                        log.debug("Removing method: " + ms[i]);
+                        cg.removeMethod(ms[i]);
+                    }
                 }
-            }
-            org.apache.bcel.classfile.Field[] fs = jc.getFields();
-            for (int i = 0; i < fs.length; i++) {
-                if (!clazz.containsField(fs[i].getName(), fs[i]
-                        .getSignature())) {
-                    log.debug("Removing field: " + fs[i]);
-                    cg.removeField(fs[i]);
+                org.apache.bcel.classfile.Field[] fs = jc.getFields();
+                for (int i = 0; i < fs.length; i++) {
+                    if (!clazz.containsField(fs[i].getName(), fs[i]
+                            .getSignature())) {
+                        log.debug("Removing field: " + fs[i]);
+                        cg.removeField(fs[i]);
+                    }
                 }
+                cg.update();
             }
-            cg.update();
+
             File file = new File(directory, className.replace('.',
                     File.separatorChar).concat(".class"));
             log.debug("Dumping class: " + className + " to file: " + file);
@@ -65,5 +72,6 @@ public class Transformer implements Visitor {
 	            log.error("Error on dumping class: " + className + " to file: " + file, e);
 			}
         }
+        log.debug("\n\n");
 	}
 }

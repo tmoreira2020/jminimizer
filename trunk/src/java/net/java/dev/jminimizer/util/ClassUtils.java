@@ -1,10 +1,11 @@
 package net.java.dev.jminimizer.util;
 
 
+import net.java.dev.jminimizer.beans.Method;
+
 import org.apache.bcel.Repository;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.FieldGen;
-import org.apache.bcel.generic.MethodGen;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,7 +18,7 @@ public class ClassUtils {
 
 	private static final Log log = LogFactory.getLog(ClassUtils.class);
 
-	public static boolean isMethodOverridFromSuperClass(MethodGen method)
+	public static boolean isMethodOverridFromSuperClass(Method method)
 		throws ClassNotFoundException {
 		String className= method.getClassName();
 		Class clazz = Class.forName(className);
@@ -26,19 +27,19 @@ public class ClassUtils {
 			return true;
 		} else {
 			clazz= clazz.getSuperclass();
-			MethodGen m= findMethod(clazz.getName(), method.getName(), method.getSignature());
-			return m != null;
+			return null != findMethod(clazz.getName(), method.getName(), method.getSignature());
 		}
 	}
 
-	public static MethodGen findMethod(String className, String name, String signature) throws ClassNotFoundException {
+	public static Method findMethod(String className, String name, String signature) throws ClassNotFoundException {
 		ClassGen clazz = new ClassGen(Repository.lookupClass(className));
 		org.apache.bcel.classfile.Method method;
 		do {
 			method = clazz.containsMethod(name, signature);
 			if (method != null) {
-				log.debug("Method find: " + clazz.getClassName() + "." +method);
-				return new MethodGen(method, clazz.getClassName(), clazz.getConstantPool());
+				Method m= new Method(clazz.getClassName(), method.getName(), method.getSignature());
+				log.debug("Method find: " + m);
+				return m;
 			}
 			clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
 		} while (!clazz.getClassName().equals("java.lang.Object"));
