@@ -1,8 +1,8 @@
 package net.java.dev.jminimizer;
 import java.io.File;
-import java.net.URL;
 
 import junit.framework.TestCase;
+import net.java.dev.jminimizer.util.Configurator;
 import net.java.dev.jminimizer.util.Repository;
 import net.java.dev.jminimizer.util.URLRepository;
 import net.java.dev.jminimizer.util.XMLConfigurator;
@@ -40,10 +40,8 @@ public class AnalyserTest extends TestCase {
 //		an.visit(new Transformer(an.getRepository(), d));
 	}
 	private Analyser getAnalyser() throws Exception {
-		URL[] program = new URL[]{new URL("file:target/test-classes/")};
-		URL[] runtime = new URL[]{};
-		Repository repo = new URLRepository(program, runtime);
-		return new Analyser(new XMLConfigurator(new File(AllTests.TEST_PATH + "xml",
-				"AnalyserTest.xml"), repo), repo);
+		Configurator configurator= new XMLConfigurator(new File(AllTests.TEST_PATH + "xml",	"AnalyserTest.xml"));
+		Repository repo= new URLRepository(configurator.getProgramClasspath(), configurator.getRuntimeClasspath());
+		return new Analyser(configurator, repo);
 	}
 }
