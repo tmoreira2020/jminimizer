@@ -12,7 +12,7 @@
     <shortDescription>A Java tool to reduce the size of jar files</shortDescription>
     <url>https://jminimizer.dev.java.net/</url>
     <repository>
-        <connection>scm:cvs:pserver:anonCVS:cvs.dev.java.net:/cvs:jminimizer</connection>
+        <connection>scm:cvs:pserver:anonCVS@cvs.dev.java.net:/cvs:jminimizer</connection>
         <developerConnection>scm:cvs:pserver:DEVELOPER_ID:cvs.dev.java.net:/cvs:jminimizer</developerConnection>
         <url>https://jminimizer.dev.java.net/source/browse/jminimizer/</url>
     </repository>
