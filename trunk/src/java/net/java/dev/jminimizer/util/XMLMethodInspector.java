@@ -1,5 +1,6 @@
 package net.java.dev.jminimizer.util;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class XMLMethodInspector implements MethodInspector {
     /**
      *  
      */
-    public XMLMethodInspector(String file, Repository repository)
+    public XMLMethodInspector(File file, Repository repository)
             throws Exception {
         super();
         this.initPrimitives();
@@ -124,7 +125,7 @@ public class XMLMethodInspector implements MethodInspector {
             buffer.append('|');
         }
         for (int i = 0; i < n; i++) {
-            String temp = list.item(i).getFirstChild().getNodeValue();
+            String temp = list.item(i).getFirstChild().getNodeValue().trim();
             if (temp.startsWith("*") && temp.endsWith("*")) {
                 buffer.append(ClassUtils.normalize(temp));
             } else if (temp.startsWith("*")) {

@@ -37,7 +37,7 @@ public class ClassUtils {
 		do {
 			method = clazz.containsMethod(name, signature);
 			if (method != null) {
-				log.debug("Method find: " + method);
+				log.debug("Method find: " + clazz.getClassName() + "." +method);
 				return new MethodGen(method, clazz.getClassName(), clazz.getConstantPool());
 			}
 			clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
@@ -51,7 +51,7 @@ public class ClassUtils {
 		do {
 			field = clazz.containsField(name);
 			if (field != null) {
-				log.debug("Field find: " + field);
+				log.debug("Field find: " + clazz.getClassName() + "." +field);
 				return new FieldGen(field, clazz.getConstantPool());
 			}
 			clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
