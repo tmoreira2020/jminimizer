@@ -1,0 +1,29 @@
+\chapter{Outras Ferramentas e trabalhos}
+Nas pesquisas que desenvolvi pude observar que muitos trabalhos já foram realizados na busca por uma diminuição das aplicações Java\cite{java}. Alguns propondo uma reestruturação do bytecode java \cite{tailored}, outros sugerindo uma compactação diferente para os arquivos JAR \cite{jar} \cite{jazz}, no entanto estes propoem mudanças estruturais muito porfundas, tanto nos arquivos class ou jars, tão profundas que só ferramentas especiais são capazes de ler estes tipos de arquivo. Porem também encontrei ferramentas que reduzem as aplicações Java sem modificar sua estrutura básica e assim, são perfeitamentes compatíveis com a especificação Java \cite{javaspec} entre elas estão o Jax\cite{jax},  SophiaCompression\cite{sophia} entre outras. A seguir serão descritas brevemente cada uma das ferramentas que estudei.
+
+\section{Obfuscadores}
+Obfuscadores são ferramentas de grande utilização na distribuição de aplicações Java eles não impedem, mas dificultam a engenharia reversa que consiste em a partir do arquivos class obter um arquivo fonte. Além de obfuscarem os arquivos class essas ferramentas tem como efeito colateral a diminuição da aplicação final, por isso foram objetos de pesquisa dessa tese. Isto ocorre devido a troca dos nomes das classes e pacotes por nomes mais simples e compactos por exemplo, a classe original com nome \textit{net.java.dev.jminimizer.JMinimizer} é renomeada para \textit{a.b.c.d.A}, isto impacta significativamente na diminuição dos arquivos class.
+
+\subsection{Retroguard}
+O Retroguard é um obfuscador de bytecode, uma ferramenta projetada para substituir identificadores e atributos de compreensão fácil por humanos por strings sem sentido, tornando a engenharia reversa quase impossível. O resultado da execução do Retroguard é aplicações menores e com o código fonte protegido. Retroguard é distribuido sobre licensa GNU LGPL\footnote{Lesser General Public License}. 
+Algumas características:
+\begin{enumerate}
+\item redução do tamanho do bytecode Java (reduzindo 50\% é possível, 20-30\% é típico) levando à obtenção mais rápida das aplicações 
+\item projetado para ser fácilmente incorporado ao processo de desenvolvimento de aplicaçlões Java.
+\item permite uma costumização completa do processo de obfuscação.
+\item suporta multiplos \textit{entry points}.
+\item atual sobre arquivos JAR\cite{jar}.
+\item obfuscação é controlado por uma linguagem de script flexível.
+\item uma interface gráfica é provida para um simples gerenciamento de scripts.
+\item usa massivamente sobrecarga de nomes de métodos e campos para um aumento da segurança.
+\item gera unicamente bytecode Java verificado e completamente compatível com a especificação da máquina virtual Java.
+\item atualiza o arquivo Manifest dos arquivos JAR, utilizanbdo nomes obfuscados e automaticamente gerando menssagens sumário MD5 e SHA-1.
+\end{enumerate}
+
+\subsection{ProGuard}
+ProGuard é um otimizador e um obfuscador para bytecode Java. Ele pode detectar e remover classes, métodos, campos e atributos que não são usados. Também pode otimizar e remover instruções não usadas. Finalmente, ele renomeia classes, campos e métodos usando nomes curtos e sem sentido, resultando em arquivos JARs menores e de difícil execução de uma possível engenharia reversa.
+
+\section{Compactadores}
+\subsection{SophiaCompress}
+\subsection{Jax}
+\subsection{Jazz}

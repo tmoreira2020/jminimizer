@@ -1,17 +1,18 @@
-\section{Fundamentação Teórica}
-O produto final do desenvolvimento de uma aplicação Java é um ou mais arquivos class, também chamados de bytecode. Cada arquivo com a extensão class representa uma classe ou interface na aplicação (FALAR SOBRE INNNERCLASS ????). Esses arquivos class são o resultado da compilação dos arquivos de código fonte, e sua estrutura é praticamente um mapeamento um para um da linguagem Java.
-É atravez desses arquivos class que analisei e fiz transformações na sua estrutura para reduzir o tamanho das aplicações Java. Uma breve explicação sobre a estrutura do bytecode se faz necessária, visto que eles são o objeto principal de estudo desse trabalho.
+\chapter{Fundamentação Teórica}
+Para poder realizar as transformações que este trabalho se porpoê em fazer é necessário antes, uma breve explicação da estrutura do objeto alvo dessa dissertação, o bytecode Java.
+O produto final do desenvolvimento de uma aplicação Java é um ou mais arquivos class, também chamados de bytecode. Cada arquivo com a extensão class representa uma classe ou interface na aplicação, tanto um como o outro possuem a mesma estrutura em arquivo, há somente uma flag diferenciando um do outro. Esses arquivos class são o resultado da compilação dos arquivos de código fonte, e sua estrutura é praticamente um mapeamento um para um da linguagem Java.
+É atravez desses arquivos class que foram feitas analises e transformações na sua estrutura para reduzir o tamanho das aplicações Java. 
 
-A estrutura do bytecode
+\section{A estrutura do bytecode}
 
-Cada arquivo com a extensão class representa uma classe e ou uma interface na linguagem Java. Esses arquivos são constituídos de um array de bytes.
+Cada arquivo com a extensão class representa uma classe ou uma interface na linguagem Java. Esses arquivos são constituídos de um array de bytes.
 \begin{figure}[ht]
   \centering
-  \includegraphics{imagens/classfile.jpg}
+  \includegraphics[width=10cm,height=9cm]{imagens/classfile.jpg}
   \caption{formato de um arquivo .class\label{img:classfile}}
 \end{figure}
 
-A figura \ref{img:classfile} exemplifica de maneira simples a organização e o significado de cada byte ou conjunto de bytes. O significado das representações u1, u2 e u4 são: u representando um byte sem sinal e o decimal (1, 2 e 4) representado a quantidade de bytes. Então o valor magic é composto dos quatros primeiros bytes sem sinais do arquivo class. A seguir serão exemplificados cada uma das estruturas que compõem o bytecode.
+A figura \ref{img:classfile} exemplifica de maneira simples a organização e o significado de cada byte ou conjunto de bytes na estrutura do arquivo class. O significado das representações u2 e u4 são: u representando um byte sem sinal e o decimal (2 e 4) representado a quantidade de bytes. Por exemplo, o valor magic é composto dos quatros primeiros bytes sem sinais do arquivo class. A seguir serão exemplificados cada uma das estruturas que compõem o bytecode.
 
 \begin{enumerate}
 \item magic: este numero é fixo para qualquer bytecode e tem o valor 0xCAFEBABE. O objetivo desse identificador é previnir as JVMs de carregar outras coisas que não sejam classes Java.
@@ -29,7 +30,7 @@ A figura \ref{img:classfile} exemplifica de maneira simples a organização e o si
 
 \begin{figure}[ht]
   \centering
-  \includegraphics{imagens/field.jpg}
+  \includegraphics[width=8cm,height=5cm]{imagens/field.jpg}
   \caption{estrutura de um campo \label{img:field}}
 \end{figure}
 
@@ -45,7 +46,7 @@ A figura \ref{img:classfile} exemplifica de maneira simples a organização e o si
 
 \begin{figure}[ht]
   \centering
-  \includegraphics{imagens/method.jpg}
+  \includegraphics[width=8cm,height=5cm]{imagens/method.jpg}
   \caption{estrutura de um método \label{img:method}}
 \end{figure}
 
@@ -60,16 +61,40 @@ A figura \ref{img:classfile} exemplifica de maneira simples a organização e o si
 \item attributes: tabela que contem estruturas que representam os atributos desta classe ou interface.
 \end{enumerate}
 
-Conhecendo a fundo o bytecode pude observar quais estruturas eu poderia fazer transformações ou até mesmo retira-las para diminuir o tamanho da aplicação. 
-Na especificação da linguagem Java, está explicito que algumas das estruturas que encontramos no bytecode podem ser facilmente retiradas sem mudança no comportamento do software. A seção 4.7 de The JavaTM Virtual Machine Specification\cite[javaspec] exemplifica que alguns atributos tanto de classe, de métodos ou de campos, podem ser retirados sem nenhum problema. Estes atributos são SourceFile, LineNumberTable, LocalVariableTable e Deprecated. Os três primeiros dizem respeito somente a informações para depuração como o arquivo de código fonte do qual foi gerado a classe ou interface, tabela que contem os números das linhas mapeados com o das instruções e uma tabela que contem as variáveis locais dos métodos. O ultimo atributo sinaliza ao desenvolvedor que a classe, o método ou o campo que possui este atributo não deve ser utilizado pois ele entrou em desuso. Geralmente quando uma estrutura é marcada como Deprecated outra estrutura assume o papel da depreciada.
-Vários compilador fornecem meios de na hora da geração do bytecode os atributos responsáveis pela depuração, serem excluídos do arquivo class. Esta é uma técnica de compactação de código Java simples e de pouco efeito colateral.
+Conhecendo a fundo o bytecode foram observadas estruturas que podem receber transformações ou até mesmo serem retiradas, visando a diminuição do tamanho da aplicação. Na especificação da linguagem Java, exatamente na seção 4.7 de The JavaTM Virtual Machine Specification\cite[javaspec], está explicito que algumas das estruturas que encontramos no bytecode podem ser facilmente retiradas sem mudança no comportamento do software. Tais estruturas são: SourceFile, LineNumberTable e LocalVariableTable, elas representam respectivamente, o nome do arquivo fonte a tabela do número das linhas no código fonte e a tabela de variáveis locais dos métodos. Vários compiladores fornecem meios, através de parametros, de, na hora da geração do bytecode, os atributos responsáveis pela depuração serem excluídos do arquivo class. Esta é uma técnica de compactação de código Java simples.
+\begin{table}[h]
+ \caption{Compilação com e sem os atributos de depuração     \label{compilacaoDebug}}
+% \vspace{3 in}
+ \begin{center}
+  \begin{tabular*}{15cm}{c|c|c}
+    \hline
+	Classe/Interface	&	com atributos de depuração (bytes)	&	sem aributos de depuração (bytes)	\\
+    \hline
+	net.java.dev.jminimizer.Analyser	&	8.686	&	7.991	\\
+    \hline
+	net.java.dev.jminimizer.JMinimizer	&	3.527	&	3.310	\\
+    \hline
+	net.java.dev.jminimizer.Transformer	&	16.591	&	15.353	\\
+    \hline
+	net.java.dev.jminimizer.util.ClassUtils	&	3.770	&	3.485	\\
+    \hline
+	net.java.dev.jminimizer.util.Repository	&	247	&	208	\\
+    \hline
+	net.java.dev.jminimizer.util.Visitor	&	245	&	209	\\
+    \hline
+  \end{tabular*}
+ \end{center}
+\end{table}
+Além desses três atributos de classe, existe também um atributo que sinaliza ao desenvolvedor que a classe, o método ou o campo não deve ser utilizado, pois ele entrou em desuso, esse atributo é chamado de Deprecated. Geralmente quando uma estrutura é marcada como Deprecated outra estrutura assume o papel da depreciada. Esse atributo não está explicitamente referenciado na especificação da linguagem Java como podendo ser removido, mas como ele é apenas um sinalisador para o desenvolvedor e não influênciando na execução da aplicação pode também ser removido ser problema da aplicação final.
 
-(PRECISO COLOCAR ESTATISTICAS SOBRE O USO E O NÃO USO DOS ATRIBUTOS DE DEPURAÇÃO)
+\section{BCEL}
+No entanto, mesmo conhecendo a estrutura do bytecode, sua manipulação através de um software não é fácil, pois como já dito anteriormente, um arquivo class é uma array de bytes. Visto essa dificuldade foi criado uma biblioteca de classes que facilitam a manipulação de um arquivo class. Essa biblioteca é chamada de BCEL que é o acronomo de \textit{Byte Code Engineering Library}\cite{bcel}, que visa oferecer aos seus usuários uma maneira conveniente de analisar, manipular e criar arquivos class. BCEL representa as classes ou interfaces contidas nos arquivos class por objetos\cite{booch}, com um nível elevado de abstração, que possuem todas as informações desses arquivos, como: métodos, campos, lista de instruções dos métodos, herança, etc \dots A figura \ref{img:javaclassUML} representa o diagrama de classe da API\footnote{Application Programming Interface} de BCEL, responsável por mapear as estrutura do array de bytes em objetos de fácil manipulação pelo desenvolvedor. Tais objetos podem ser lidos de um arquivo (ou de qualquer stream de entrada), serem modificados por algum programa e gravados em arquivos novamente (ou enviados a um stream de saída). Também pode-se criar classes ou interfaces do zero em tempo de execução. 
 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=28cm,height=16cm]{imagens/javaclassUML.png}
+  \caption{diagrama de classe de BCEL \label{img:javaclassUML}}
+\end{figure}
 
-
-
-
-Na maioria das vezes bibliotecas Java\cite{java} são disponibilizadas na forma de bytecode\cite{javaspec}, que são o resultado da compilação de um código fonte Java\cite{java}. Felizmente este tipo de representação é de alto nível e através desta representação é possível determinar hierarquias de classes, informações sobre tipos, aritmética flutuante, tabelas de variáveis locais, tabelas de numero de linhas, etc.
-É baseado no bytecode Java que as transformações e compactações são realizadas, conseqüentemente não haverá problemas na manipulação das bibliotecas de terceiros, exceto se na licença da biblioteca conter termos que proíbam modificações na mesma. Se a biblioteca não for disponibilizada na forma de bytecode e sim como código fonte basta uma simples compilação para obtermos o bytecode desejado.
-Existem alguns artifícios que podemos utilizar para diminuir ou compactar uma aplicação Java. Uma técnica muito simples e de pouco impacto é a remoção dos atributos de classe e de código dos métodos. Tabelas de variáveis locais, tabela de numero de linhas são dois exemplos de informações que estão disponíveis no bytecode Java e que podem ser descartas sem nenhum impacto em performance e comportamento da aplicação, já que estes dois atributos são utilizados para depuração.
+BCEL também é util na aprendizagem sobre a Java Virtual Machine (JVM) e o formato dos arquivos class. Compiladores, otimizadores, obfuscadores, geradores de código e ferremantes de análise, vem utilizando BCEL com sucesso. Varios desses projetos podem ser consultados em http://jakarta.apache.org/bcel/projects.html.
+Dada a existência de BCEL não foi necessário implementar um leitor de arquivos class, que é de suma importãncia para o desenvolver desse trabalho. Necessário foi, aprender a trabalhar com as ferramentas e conhecer a API de BCEL.
