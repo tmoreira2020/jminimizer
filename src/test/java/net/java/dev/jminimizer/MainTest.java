@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.apache.bcel.classfile.ClassParser;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -54,19 +56,33 @@ public class MainTest extends TestCase {
 		this.performTest("test10");
 	}
 	
+	public void testMain11() {
+		this.performTest("test11");
+	}
+	
 	private void performTest(String order) {
 		String[] args= new String[]{"-c", "src/test/xml/"+order+".xml"}; 
 		try {
 			JMinimizer.main(args);
 		} catch (Exception e) {
-			e.printStackTrace();
 			Assert.assertTrue(e.getMessage(), false);
 		}
+		Method method= null;
 		try {
 			ClassLoader loader= new URLClassLoader(new URL[]{new URL("file:./target/test-jminimizer/"+order+"/classes/")}, null);
 			Class clazz= loader.loadClass("net.java.dev.jminimizer."+order+".Main");
-			Method method= clazz.getMethod("main", new Class[]{String[].class});
+			method= clazz.getMethod("main", new Class[]{String[].class});
+		} catch (Throwable e) {
+			Assert.assertTrue(e.getMessage(), false);
+		}
+		try {
 			method.invoke(null, new Object[]{new String[0]});
+		} catch (Throwable e) {
+			Assert.assertTrue(e.getMessage(), false);
+		}
+		try {
+		    ClassParser classParser= new ClassParser("./target/test-jminimizer/"+order+"/classes/net/java/dev/jminimizer/"+order+"/Main.class");
+		    classParser.parse();
 		} catch (Throwable e) {
 			Assert.assertTrue(e.getMessage(), false);
 		}

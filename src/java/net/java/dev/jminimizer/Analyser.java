@@ -2,10 +2,12 @@ package net.java.dev.jminimizer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.java.dev.jminimizer.beans.Field;
 import net.java.dev.jminimizer.beans.Method;
@@ -62,7 +64,7 @@ public class Analyser {
         this.inspecter = inspecter;
         this.repository = repository;
         this.notProcessedMethods = new HashSet();
-        this.classes = new HashSet();
+        this.classes = new TreeSet(Collections.reverseOrder());
         this.methodsThatUseClassForName = new HashSet();
         Repository.setRepository(this.repository);
     }
@@ -217,7 +219,7 @@ public class Analyser {
         int size = methods.size();
         JavaClass superClass = jc.getSuperClass();
         while (superClass != null && methods.size() != 0 && inspecter.inspect(className)) {
-            analiseMethodFromSuperClass(methods, superClass, className, usedMethods);
+            this.analiseMethodFromSuperClass(methods, superClass, className, usedMethods);
             superClass = superClass.getSuperClass();
         }
         JavaClass[] is = jc.getAllInterfaces();

@@ -371,7 +371,7 @@
 		<file name="jminimizer.jar"/>
 	</output>
 	<report>
-		<directory path="report"/>
+		<directory path="target/jminimizer-report"/>
 		<xsl encoding="ISO8859-1" path=""/>
 	</report>
 </configuration>
