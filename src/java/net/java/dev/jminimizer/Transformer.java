@@ -83,22 +83,29 @@ public class Transformer implements Visitor {
 
     private ZipOutputStream out;
 
-    private Repository repo;
+    private Repository repository;
 
     private Set usedMethods;
+    
+    private Set methodsThatUseClassForName;
     
     private String classname;
     
     /**
-     *  
+     * @param configurator
+     * @param repository
+     * @param usedMethods
+     * @param methodsThatUseClassForName
+     * @throws IOException
      */
-    public Transformer(Set usedMethods, Configurator configurator,
-            Repository repo) throws IOException {
+    public Transformer(Configurator configurator, Repository repository,
+            Set usedMethods, Set methodsThatUseClassForName) throws IOException {
         super();
-        this.usedMethods = usedMethods;
         this.configurator = configurator;
-        this.repo = repo;
-        this.classes = repo.getProgramClasses();
+        this.repository = repository;
+        this.usedMethods = usedMethods;
+        this.methodsThatUseClassForName= methodsThatUseClassForName;
+        this.classes = repository.getProgramClasses();
         File output = configurator.getTransformationOutput();
         if (output.isFile()) {
             out = new ZipOutputStream(new FileOutputStream(output, false)) {
@@ -185,7 +192,7 @@ public class Transformer implements Visitor {
         eClazz.setAttribute("name", className);
         document.appendChild(eClazz);
         if (classes.contains(className)) {
-            JavaClass jc = repo.findClass(className);
+            JavaClass jc = repository.findClass(className);
             ClassGen cg = new ClassGen(jc);
 //            if (className.indexOf("$") == -1) {
                 org.apache.bcel.classfile.Method[] ms = jc.getMethods();
@@ -200,7 +207,7 @@ public class Transformer implements Visitor {
                                     ms[i]));
                         }
                     } else {
-                        if (Analyser.runtimeClassLoaderMethods.contains(m)) {
+                        if (methodsThatUseClassForName.contains(m)) {
                             org.apache.bcel.classfile.Method mc= m.toClassFileMethod();
                             ConstantPoolGen pool= cg.getConstantPool();
                             if (classname == null) {

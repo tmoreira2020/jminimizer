@@ -4,6 +4,7 @@
 		<ant:copy todir="${maven.build.dir}/latex">
 			<fileset dir="${maven.latex.src.dir}">
 				<include name="**/*.xml"/>
+				<include name="**/*.java"/>
 			</fileset>
 		</ant:copy>
 	</postGoal>
