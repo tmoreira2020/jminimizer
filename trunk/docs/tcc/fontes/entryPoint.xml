@@ -1,0 +1,22 @@
+        <class name="net.java.dev.jminimizer.Midlet">
+                <method name="startApp">
+                        <arguments/>
+                        <return>
+                                <void/>
+                        </return>
+                </method>
+                <method name="pauseApp">
+                        <arguments/>
+                        <return>
+                                <void/>
+                        </return>
+                </method>
+                <method name="destroyApp">
+                        <arguments>
+                                <primitiveType name="boolean"/>
+                        </arguments>
+                        <return>
+                                <void/>
+                        </return>
+                </method>
+        </class>
