@@ -1,35 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT arguments (classType?,primitiveType?)*>
-<!ELEMENT class (constructor*,method*)>
-<!ATTLIST class name NMTOKEN #REQUIRED>
-<!ELEMENT classType EMPTY>
-<!ATTLIST classType name CDATA #REQUIRED>
 <!ELEMENT configuration (programClasspath,runtimeClasspath?,inspect,notInspect?, output?, report?)>
+<!ATTLIST configuration deepStripment (true|false) #IMPLIED>
+
+<!ELEMENT programClasspath (url*, directory*, fileset*)>
+
+<!ELEMENT runtimeClasspath (url*, directory*, fileset*)>
+
+<!ELEMENT url (#PCDATA)>
+
+<!ELEMENT directory EMPTY>
+<!ATTLIST directory path CDATA #REQUIRED>
+
+<!ELEMENT fileset (file+)>
+<!ATTLIST fileset directory CDATA #REQUIRED>
+
+<!ELEMENT file EMPTY>
+<!ATTLIST file name CDATA #REQUIRED>
+
 <!ELEMENT inspect (class*)>
 
+<!ELEMENT class (constructor*,method*)>
+<!ATTLIST class name NMTOKEN #REQUIRED>
+
 <!ELEMENT constructor (arguments)>
+
 <!ELEMENT method (arguments,return)>
 <!ATTLIST method name CDATA #REQUIRED>
 
-<!ELEMENT notInspect (pattern*)>
-<!ELEMENT pattern (#PCDATA)>
+<!ELEMENT arguments (classType?,primitiveType?)*>
+
+<!ELEMENT classType EMPTY>
+<!ATTLIST classType name CDATA #REQUIRED>
 
 <!ELEMENT primitiveType EMPTY>
 <!ATTLIST primitiveType name (boolean|byte|char|int|float|long|double) #REQUIRED>
 
 <!ELEMENT return (classType|primitiveType|void)>
+
 <!ELEMENT void EMPTY>
 
-<!ELEMENT programClasspath (url*, directory*, fileset*)>
-<!ELEMENT runtimeClasspath (url*, directory*, fileset*)>
-
-<!ELEMENT url (#PCDATA)>
-<!ELEMENT directory EMPTY>
-<!ATTLIST directory path CDATA #REQUIRED>
-<!ELEMENT fileset (file+)>
-<!ATTLIST fileset directory CDATA #REQUIRED>
-<!ELEMENT file EMPTY>
-<!ATTLIST file name CDATA #REQUIRED>
+<!ELEMENT notInspect (pattern*)>
+<!ELEMENT pattern (#PCDATA)>
 
 <!ELEMENT output (directory|file)>
 

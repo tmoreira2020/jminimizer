@@ -21,7 +21,6 @@ import net.java.dev.jminimizer.util.Visitor;
 
 import org.apache.bcel.Constants;
 import org.apache.bcel.classfile.Attribute;
-import org.apache.bcel.classfile.Constant;
 import org.apache.bcel.classfile.ConstantUtf8;
 import org.apache.bcel.classfile.Field;
 import org.apache.bcel.classfile.JavaClass;
@@ -59,8 +58,6 @@ import org.w3c.dom.Element;
  *  
  */
 public class Transformer implements Visitor {
-	
-	private static final Constant EMPTY= new ConstantUtf8("");
 	
 	private static final Log log = LogFactory.getLog(Transformer.class);
 	
@@ -239,7 +236,7 @@ public class Transformer implements Visitor {
 		return eMethod;
 	}
 	
-	private void transformbySynthetic(MethodGen method, ConstantPoolGen pool, InstructionList code){
+	private void transformBySynthetic(MethodGen method, ConstantPoolGen pool, InstructionList code){
 		InstructionHandle start= code.getStart();
 		InstructionHandle end= code.getEnd();
 		InstructionHandle temp= start.getNext();
@@ -249,7 +246,7 @@ public class Transformer implements Visitor {
 		try {
 			code.delete(temp, end);
 		} catch (TargetLostException e) {
-			System.out.println("ERRRRRO");
+			//System.out.println("ERRRRRO");
 			InstructionHandle[] targets = e.getTargets();
 			for(int d=0; d < targets.length; d++) {
 				InstructionTargeter[] targeters = targets[d].getTargeters();
@@ -275,7 +272,7 @@ public class Transformer implements Visitor {
 			}                
 			//e.printStackTrace();
 		}
-		System.out.println(code);
+		//System.out.println(code);
 	}
 	
 	/**
@@ -291,7 +288,7 @@ public class Transformer implements Visitor {
 		//test if this method is Synthetic
 		for (int i = 0; i < attrs.length; i++) {
 			if (attrs[i] instanceof Synthetic && !method.getName().equals(SYNTHETIC_METHOD_NAME)) {
-				this.transformbySynthetic(method, pool, code);
+				this.transformBySynthetic(method, pool, code);
 			}
 		}
 		//test if this method has a sequence os instructions write by compiler
@@ -381,9 +378,9 @@ public class Transformer implements Visitor {
 			Element eClazz = document.createElement("class");
 			eClazz.setAttribute("name", className);
 			document.appendChild(eClazz);
-			JavaClass jc = repository.findClass(className);
-			ClassGen cg = new ClassGen(jc);
-			org.apache.bcel.classfile.Method[] ms = jc.getMethods();
+			JavaClass javaClass = repository.findClass(className);
+			ClassGen cg = new ClassGen(javaClass);
+			org.apache.bcel.classfile.Method[] ms = javaClass.getMethods();
 			log.debug("Cleaning class: " + className);
 			for (int i = 0; i < ms.length; i++) {
 				Method m = new Method(className, ms[i].getName(), ms[i]
@@ -405,12 +402,11 @@ public class Transformer implements Visitor {
 							cg.addMethod(this.createMethod(m.getClassName(), pool).getMethod());
 						}
 						cg.replaceMethod(mc ,this.transform(m.toMethodGen(), pool));
-						cg.setConstantPool(pool);
 					}
 				}
 			}
 			//Deleting fields
-			Field[] fields= jc.getFields();
+			Field[] fields= javaClass.getFields();
 			for (int i = 0; i < fields.length; i++) {
 				net.java.dev.jminimizer.beans.Field field= new net.java.dev.jminimizer.beans.Field(className, fields[i].getName(), fields[i].getSignature());
 				if(!usedMethods.contains(field)) {
@@ -418,10 +414,9 @@ public class Transformer implements Visitor {
 					cg.removeField(fields[i]);
 				}
 			}
-			//TODO colocar aqui o codigo para limpar p constantpool
-			cg.update();
-			cg.getJavaClass().accept(new ConstantPoolCleanerVisitor());
-			this.dump(cg.getJavaClass());
+			log.debug("Cleaning up the constant pool of class: "+ cg.getClassName());
+			javaClass= new ConstantPoolCleanerVisitor(configurator.isDeepStripment()).cleanUpClassGen(cg);
+			this.dump(javaClass);
 			if (eClazz.hasChildNodes()) {
 				File directory = configurator.getReportDirectory();
 				directory.mkdirs();

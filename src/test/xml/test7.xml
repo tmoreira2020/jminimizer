@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE configuration SYSTEM "../../../resources/configuration.dtd">
+<configuration>
+	<programClasspath>
+		<directory path="target/test-classes"/>
+	</programClasspath>
+	<inspect>
+		<class name="net.java.dev.jminimizer.test7.Main">
+			<method name="main">
+				<arguments>
+					<classType name="java.lang.String[]"/>
+				</arguments>
+				<return>
+					<void></void>
+				</return>
+			</method>
+		</class>
+	</inspect>
+	<notInspect>
+		<pattern>java*</pattern>
+	</notInspect>
+	<output>
+		<directory path="target/test-jminimizer/test7/classes"/>
+	</output>
+	<report>
+		<directory path="target/test-jminimizer/test7/report"/>
+	</report>
+</configuration>
