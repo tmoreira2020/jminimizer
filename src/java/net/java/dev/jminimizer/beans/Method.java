@@ -27,6 +27,10 @@ public class Method extends FieldOrMethod {
 	public Method(MethodGen method) {
 		this(method.getClassName(), method.getName(), method.getSignature(), false); 
 	}
+	
+	public Method(java.lang.reflect.Method method) {
+	    this(method.getDeclaringClass(), method.getName(), method.getParameterTypes(), method.getReturnType(), false);
+	}
 
 	public Method(java.lang.Class className, String name, java.lang.Class[] argumentClasses, java.lang.Class returnClass, boolean inSubClasses) {
 		Type[] argumentTypes = new Type[argumentClasses.length];

@@ -3,7 +3,7 @@ import java.io.File;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import net.java.dev.jminimizer.util.ClassLoaderTest;
+import net.java.dev.jminimizer.util.RepositoryTest;
 import net.java.dev.jminimizer.util.XMLMethodInspectorTest;
 
 import org.apache.commons.logging.Log;
@@ -31,7 +31,7 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for net.java.dev.jminimizer");
 		//$JUnit-BEGIN$
-//		suite.addTestSuite(ClassLoaderTest.class);
+		suite.addTestSuite(RepositoryTest.class);
 		suite.addTestSuite(XMLMethodInspectorTest.class);
 		suite.addTestSuite(AnalyserTest.class);
 		//$JUnit-END$

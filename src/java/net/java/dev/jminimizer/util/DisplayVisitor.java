@@ -1,67 +1,41 @@
 package net.java.dev.jminimizer.util;
 
+import net.java.dev.jminimizer.beans.Class;
 import net.java.dev.jminimizer.beans.Field;
 import net.java.dev.jminimizer.beans.Method;
 
-import org.apache.bcel.Repository;
-import org.apache.bcel.generic.ClassGen;
-import org.apache.bcel.generic.FieldGen;
-import org.apache.bcel.generic.MethodGen;
-
 
 /**
- * @author Thiago Leão Moreira <thiago.leao.moreira@terra.com.br>
- * 
+ * @author Thiago Leão Moreira <thiago.moreira@datasul.com.br>
+ * @since Apr 15, 2004
+ *
  */
 public class DisplayVisitor implements Visitor {
 
-	protected String className;
-	protected ClassGen clazz;
+    /**
+     * 
+     */
+    public DisplayVisitor() {
+        super();
+    }
 
-	/**
-	 * 
-	 */
-	public DisplayVisitor() {
-		super();
-	}
-
-	/**
-	 * @see br.ufsc.inf.tlm.util.Visitor#visit(br.ufsc.inf.tlm.Method)
-	 */
-	public void visit(Method method) {
-		MethodGen m = null;
-		try {
-			this.init(method.getClassName());
-			m = ClassUtils.findMethod(className, method.getName(), method.getSignature());
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		System.out.print('\t');
-		System.out.println(m);
-	}
-
-	/**
-	 * @see br.ufsc.inf.tlm.util.Visitor#visit(br.ufsc.inf.tlm.Field)
-	 */
-	public void visit(Field field) {
-		FieldGen f = null;
-		try {
-			this.init(field.getClassName());
-			f = ClassUtils.findField(className, field.getName());
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		}
-		System.out.print('\t');
-		System.out.println(f);
-	}
-
-	private void init(String className) throws ClassNotFoundException {
-		if (!className.equals(this.className)) {
-			System.out.println();
-			System.out.println(className);
-			this.className = className;
-			clazz = new ClassGen(Repository.lookupClass(className));
-		}
-	}
+    /**
+     * @see net.java.dev.jminimizer.util.Visitor#visit(net.java.dev.jminimizer.beans.Class)
+     */
+    public void visit(Class clazz) {
+        System.out.println(clazz.getName());
+        System.out.println("Fields: ");
+        Field[] fields= clazz.getFields();
+        for (int i = 0; i < fields.length; i++) {
+            System.out.println("\t"+ fields[i]);
+        }
+        System.out.println("Methods: ");
+        Method[] methods= clazz.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            System.out.println("\t"+ methods[i]);
+        }
+        System.out.println();
+        System.out.println();
+    }
 
 }
