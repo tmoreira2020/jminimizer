@@ -10,9 +10,9 @@ import java.util.TreeSet;
 import net.java.dev.jminimizer.beans.Class;
 import net.java.dev.jminimizer.beans.Field;
 import net.java.dev.jminimizer.beans.FieldOrMethod;
+import net.java.dev.jminimizer.beans.Method;
 import net.java.dev.jminimizer.util.ClassUtils;
 import net.java.dev.jminimizer.util.InstructionSet;
-import net.java.dev.jminimizer.util.Method;
 import net.java.dev.jminimizer.util.MethodInspector;
 import net.java.dev.jminimizer.util.Visitor;
 import org.apache.bcel.Repository;
@@ -54,7 +54,7 @@ public class Analyser {
 		this.analyse(inspecter.getMethodsToInspect());
 	}
 	/**
-	 *
+	 *  
 	 */
 	private void addToClasses(MethodGen method) throws ClassNotFoundException {
 		String className = method.getClassName();
@@ -68,7 +68,7 @@ public class Analyser {
 		clazz.add(m);
 	}
 	/**
-	 *
+	 *  
 	 */
 	private Set analiseAbstractMethods() throws ClassNotFoundException {
 		Iterator i = repository.getProgramClasses().iterator();
@@ -90,7 +90,7 @@ public class Analyser {
 		return overridedMethods;
 	}
 	/**
-	 *
+	 *  
 	 */
 	public void analyse(Method method) throws ClassNotFoundException {
 		this.analyse(method.toMethodGen());
@@ -101,7 +101,7 @@ public class Analyser {
 		}
 	}
 	/**
-	 *
+	 *  
 	 */
 	public void analyse(Method[] ms) throws ClassNotFoundException {
 		for (int i = 0; i < ms.length; i++) {
@@ -109,7 +109,7 @@ public class Analyser {
 		}
 	}
 	/**
-	 *
+	 *  
 	 */
 	private void analyse(MethodGen method) throws ClassNotFoundException {
 		this.addToClasses(method);
@@ -129,7 +129,7 @@ public class Analyser {
 		}
 	}
 	/**
-	 *
+	 *  
 	 */
 	private void analyseFieldInstruction(Set instructions, ConstantPoolGen pool)
 			throws ClassNotFoundException {
@@ -143,7 +143,7 @@ public class Analyser {
 		}
 	}
 	/**
-	 *
+	 *  
 	 */
 	private Set analyseInvokeInstruction(Set instructions, ConstantPoolGen pool)
 			throws ClassNotFoundException {
@@ -162,14 +162,14 @@ public class Analyser {
 		return methods;
 	}
 	/**
-	 *
+	 *  
 	 */
 	private FieldGen findField(FieldInstruction fi, ConstantPoolGen pool)
 			throws ClassNotFoundException {
 		return ClassUtils.findField(fi.getClassName(pool), fi.getName(pool));
 	}
 	/**
-	 *
+	 *  
 	 */
 	private Set findInstructions(MethodGen method, String instructionPattern) {
 		Set instructions = new InstructionSet();
@@ -194,7 +194,7 @@ public class Analyser {
 		return instructions;
 	}
 	/**
-	 *
+	 *  
 	 */
 	private MethodGen findMethod(InvokeInstruction ii, ConstantPoolGen pool)
 			throws ClassNotFoundException {
@@ -202,7 +202,7 @@ public class Analyser {
 				ii.getSignature(pool));
 	}
 	/**
-	 *
+	 *  
 	 */
 	private Class getClass(Map classes, String className)
 			throws ClassNotFoundException {
@@ -238,7 +238,7 @@ public class Analyser {
 		return this.repository;
 	}
 	/**
-	 *
+	 *  
 	 */
 	public void visit(Visitor visitor) {
 		Collection col = classes.values();

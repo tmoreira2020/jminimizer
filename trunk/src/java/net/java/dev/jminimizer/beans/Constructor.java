@@ -1,17 +1,19 @@
 package net.java.dev.jminimizer.beans;
-
-import net.java.dev.jminimizer.util.*;
-
 import org.apache.bcel.generic.Type;
-
-
 /**
  * @author Thiago Leão Moreira
  * @since Apr 13, 2004
  *  
  */
 public class Constructor extends Method {
-
+	/**
+	 * @param className
+	 * @param argumentClasses
+	 */
+	public Constructor(java.lang.Class className,
+			java.lang.Class[] argumentClasses) {
+		super(className, "<init>", argumentClasses, void.class, false);
+	}
 	/**
 	 * @param className
 	 * @param signature
@@ -19,15 +21,6 @@ public class Constructor extends Method {
 	public Constructor(String className, String signature) {
 		super(className, "<init>", signature, false);
 	}
-
-	/**
-	 * @param className
-	 * @param argumentClasses
-	 */
-	public Constructor(java.lang.Class className, java.lang.Class[] argumentClasses) {
-		super(className, "<init>", argumentClasses, void.class, false);
-	}
-
 	/**
 	 * @see java.lang.Object#toString()
 	 */
