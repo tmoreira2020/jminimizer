@@ -14,7 +14,6 @@ import net.java.dev.jminimizer.util.Configurator;
 import net.java.dev.jminimizer.util.InstructionSet;
 import net.java.dev.jminimizer.util.Visitor;
 
-import org.apache.bcel.Constants;
 import org.apache.bcel.Repository;
 import org.apache.bcel.classfile.Attribute;
 import org.apache.bcel.classfile.JavaClass;
@@ -31,34 +30,37 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * @author Thiago Leão Moreira <thiago.leao.moreira@terra.com.br>
- *  
+ * @author Thiago Leão Moreira <thiagolm@dev.java.net>
+ *
+ *
+ * 
+ * 
  */
 public class Analyser {
 
     private static final Log log = LogFactory.getLog(Analyser.class);
 
-    protected Configurator inspecter;
-
-    protected net.java.dev.jminimizer.util.Repository repository;
-
-    protected Set notProcessedMethods;
-
     protected Set classes;
+
+    protected Configurator inspecter;
 
     protected Set methodsThatUseClassForName;
 
+    protected Set notProcessedMethods;
+
+    protected net.java.dev.jminimizer.util.Repository repository;
+
     /**
      * @param inspecter
-     * @param repo
+     * @param repository
      * @throws ClassNotFoundException
      */
     public Analyser(Configurator inspecter,
-            net.java.dev.jminimizer.util.Repository repo)
+            net.java.dev.jminimizer.util.Repository repository)
             throws ClassNotFoundException {
         super();
         this.inspecter = inspecter;
-        this.repository = repo;
+        this.repository = repository;
         this.notProcessedMethods = new HashSet();
         this.classes = new HashSet();
         this.methodsThatUseClassForName = new HashSet();
@@ -67,13 +69,115 @@ public class Analyser {
 
     /**
      * @param methods
+     * @param superClass
+     * @param className
+     * @param usedMethods
+     */
+    private void analiseMethodFromSuperClass(List methods, JavaClass superClass, String className, Set usedMethods) {
+        classes.add(superClass.getClassName());
+        for (int i = 0; i < methods.size();) {
+            org.apache.bcel.classfile.Method mcf = (org.apache.bcel.classfile.Method) methods
+                    .get(i);
+            Method m = new Method(className, mcf.getName(), mcf.getSignature());
+            ClassGen scg = new ClassGen(superClass);
+            if (mcf.getName().equals("<cinit>")
+                    && mcf.getSignature().equals("()V")) {
+                notProcessedMethods.add(m);
+                methods.remove(mcf);
+                log.trace("Find a class initializer: "+ m);
+                continue;
+            }
+            if (mcf.getName().equals("<init>")) {
+                methods.remove(mcf);
+                log.trace("Find a default constructor: "+ m);
+                continue;
+            }
+            if (scg.containsMethod(mcf.getName(), mcf.getSignature()) != null
+                    && !usedMethods.contains(m)) {
+                notProcessedMethods.add(m);
+                methods.remove(mcf);
+            } else {
+                i++;
+            }
+        }
+    }
+    
+    /**
+     * @param method
+     * @throws ClassNotFoundException
+     */
+    private void analiseMethodThatUseClassForName(Method method) throws ClassNotFoundException{
+        MethodGen mg= method.toMethodGen();
+        if (method.getName().equals(Transformer.SYNTHETIC_METHOD_NAME)) {
+            Attribute[] a= mg.getAttributes();
+            for (int i = 0; i < a.length; i++) {
+            	//if method was the method that centralize calls to java.lang.Class.forName(java.lang.String className) do nothing.
+                if (a[i] instanceof Synthetic) {
+                    return;
+                }
+            }
+        }
+        methodsThatUseClassForName.add(method);
+        log.debug("Method that contains a call to java.lang.Class.forName(java.lang.String className): " +method);
+    }
+
+    /**
+     * @param method
+     * @param usedMethods
      * @return @throws
      *         ClassNotFoundException
+     */
+    public void analyse(Method method, Set usedMethods)
+            throws ClassNotFoundException {
+        if (!usedMethods.contains(method)) {
+            classes.add(method.getClassName());
+            usedMethods.add(method);
+            MethodGen mg = method.toMethodGen();
+            if (mg.isNative()) {
+            	log.trace("Native method: "+ method.toString());
+                return;
+            }
+            if (mg.isAbstract()) {
+            	log.trace("Abstract method: "+ method.toString());
+            	return;
+            }
+            Instruction[] instructions = this.findInvokeInstructions(mg);
+            ConstantPoolGen pool = mg.getConstantPool();
+            Method[] ms = this.instructionToMethod(
+                    (InvokeInstruction[]) instructions, pool);
+            for (int i = 0; i < ms.length; i++) {
+                if (ms[i].getName().equals("forName")
+                        && ms[i].getClassName().equals("java.lang.Class")) {
+                    this.analiseMethodThatUseClassForName(method);
+                }
+                // test with this method should be analyse
+                if (inspecter.inspect(ms[i])) {
+                    this.analyse(ms[i], usedMethods);
+                } else {
+                    usedMethods.add(ms[i]);
+                }
+            }
+            instructions = this.findFieldInstructions(mg);
+            // Look up for use of fields. 
+            for (int i = 0; i < instructions.length; i++) {
+                FieldInstruction fi = (FieldInstruction) instructions[i];
+                String className = fi.getClassName(pool);
+                usedMethods.add(new Field(className, fi.getName(pool), fi
+                        .getSignature(pool)));
+                classes.add(className);
+            }
+        }
+    }
+
+    /**
+     * @param methods
+     * @param usedMethods
+     * @throws ClassNotFoundException
      */
     public void analyse(Method[] methods, Set usedMethods)
             throws ClassNotFoundException {
         for (int i = 0; i < methods.length; i++) {
-            this.analyse(methods[i], "", usedMethods);
+            this.analyse(methods[i], usedMethods);
         }
         this.analyseOverridedMethods(usedMethods);
         int size = notProcessedMethods.size();
@@ -83,96 +187,41 @@ public class Analyser {
             notProcessedMethods.clear();
             this.analyse(methods, usedMethods);
         }
-        log.debug("Quantidade de métodos que utilizam java.lang.Class.forName(java.lang.String className): " + methodsThatUseClassForName.size());
-    }
-    
-    private void proc(Method method) {
-        try {
-            MethodGen mg= method.toMethodGen();
-            Attribute[] a= mg.getAttributes();
-            for (int i = 0; i < a.length; i++) {
-                if (a[i] instanceof Synthetic && method.getName().equals(Transformer.METHOD_SYNTHETIC_NAME)) {
-                    System.out.println("É O CARA");
-                    return;
-                }
-            }
-            log.warn(method);
-            methodsThatUseClassForName.add(method);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        log.debug("Quantity of methods that call java.lang.Class.forName(java.lang.String className): " + methodsThatUseClassForName.size());
     }
 
     /**
-     * @param methods
+     * @param usedMethods
      * @throws ClassNotFoundException
      */
-    private void analyseOverridedMethods(Set methods)
+    private void analyseOverridedMethods(Set usedMethods)
             throws ClassNotFoundException {
         String[] cls = (String[]) classes.toArray(new String[0]);
-        //System.out.println("Free: "+ Runtime.getRuntime().freeMemory());
-        System.gc();
-        //System.out.println("Free: "+ Runtime.getRuntime().freeMemory());
         for (int i = 0; i < cls.length; i++) {
-            this.analyseOverridedMethods(cls[i], methods);
+            this.analyseOverridedMethods(cls[i], usedMethods);
         }
     }
 
     /**
-     * @param method
-     * @param methods
-     * @return @throws
-     *         ClassNotFoundException
+     * @param className
+     * @param usedMethods
+     * @throws ClassNotFoundException
      */
-    public void analyse(Method method, String tab, Set methods)
+    private void analyseOverridedMethods(String className, Set usedMethods)
             throws ClassNotFoundException {
-        if (!methods.contains(method)) {
-            classes.add(method.getClassName());
-            methods.add(method);
-            MethodGen mg = method.toMethodGen();
-            if (mg.isNative()) {
-                System.out.println("nativo");
-                return;
-            }
-            if (mg.isAbstract()) {
-            //System.out.println("abstrato");
-            return; }
-            Instruction[] instructions = this.findInvokeInstructions(mg);
-            ConstantPoolGen pool = mg.getConstantPool();
-            Method[] ms = this.instructionToMethod(
-                    (InvokeInstruction[]) instructions, pool);
-            for (int i = 0; i < ms.length; i++) {
-                if (ms[i].getName().equals("forName")
-                        && ms[i].getClassName().equals("java.lang.Class")) {
-                    this.proc(method);
-                }
-                if (inspecter.inspect(ms[i])) {
-                    //System.out.println(tab+ms[i]);
-                    this.analyse(ms[i], tab + "  ", methods);
-                } else {
-                    //					System.out.println(ms[i]);
-                    methods.add(ms[i]);
-                }
-            }
-            instructions = this.findFieldInstructions(mg);
-            for (int i = 0; i < instructions.length; i++) {
-                FieldInstruction fi = (FieldInstruction) instructions[i];
-                String className = fi.getClassName(pool);
-                methods.add(new Field(className, fi.getName(pool), fi
-                        .getSignature(pool)));
-                if (fi.getOpcode() == Constants.GETSTATIC) {
-                    //System.out.println(fi.getName(pool));
-                    //System.out.println(fi.getSignature(pool));
-                    //System.out.println();
-                }
-                if (fi.getSignature(pool).indexOf("PopupWindow") != -1) {
-                    //System.out.println(className);
-                    //System.out.println(fi.getSignature(pool));
-                }
-                classes.add(className);
-            }
+        JavaClass jc = repository.loadClass(className);
+        List methods = new ArrayList(Arrays.asList(jc.getMethods()));
+        int size = methods.size();
+        JavaClass superClass = jc.getSuperClass();
+        while (superClass != null && methods.size() != 0 && inspecter.inspect(className)) {
+            analiseMethodFromSuperClass(methods, superClass, className, usedMethods);
+            superClass = superClass.getSuperClass();
         }
+        JavaClass[] is = jc.getAllInterfaces();
+        for (int i = 0; i < is.length && methods.size() != 0 && inspecter.inspect(className); i++) {
+            this.analiseMethodFromSuperClass(methods, is[i], className, usedMethods);
+        }
+
     }
 
     /**
@@ -182,16 +231,6 @@ public class Analyser {
     private FieldInstruction[] findFieldInstructions(MethodGen method) {
         return (FieldInstruction[]) this.findInstructions(method,
                 "FieldInstruction").toArray(new FieldInstruction[0]);
-    }
-
-    /**
-     * @param method
-     * @param instructionPattern
-     * @return
-     */
-    private InvokeInstruction[] findInvokeInstructions(MethodGen method) {
-        return (InvokeInstruction[]) this.findInstructions(method,
-                "InvokeInstruction").toArray(new InvokeInstruction[0]);
     }
 
     /**
@@ -217,6 +256,22 @@ public class Analyser {
     }
 
     /**
+     * @param method
+     * @param instructionPattern
+     * @return
+     */
+    private InvokeInstruction[] findInvokeInstructions(MethodGen method) {
+        return (InvokeInstruction[]) this.findInstructions(method,
+                "InvokeInstruction").toArray(new InvokeInstruction[0]);
+    }
+    /**
+     * @return Returns the methodsThatUseClassForName.
+     */
+    public Set getMethodsThatUseClassForName() {
+        return methodsThatUseClassForName;
+    }
+
+    /**
      * @param instructions
      * @param pool
      * @return @throws
@@ -230,11 +285,10 @@ public class Analyser {
                     .getClassName(pool), instructions[i].getName(pool),
                     instructions[i].getSignature(pool));
             if (method == null) {
-                System.out.println("NÃO ACHOU O METODO");
-                System.out.println(instructions[i].getClassName(pool));
-                System.out.println(instructions[i].getName(pool));
-                System.out.println(instructions[i].getSignature(pool));
-                System.out.println();
+            	method= new Method(instructions[i].getClassName(pool), 
+            			instructions[i].getName(pool),
+						instructions[i].getSignature(pool));
+            	throw new RuntimeException("Method not find: " + method);
             } else {
                 methods.add(method);
             }
@@ -251,73 +305,5 @@ public class Analyser {
             String className = (String) iter.next();
             visitor.visit(className);
         }
-    }
-
-    /**
-     * @param className
-     * @throws ClassNotFoundException
-     */
-    private void analyseOverridedMethods(String className, Set methods)
-            throws ClassNotFoundException {
-        JavaClass jc = repository.loadClass(className);
-        List ms = new ArrayList(Arrays.asList(jc.getMethods()));
-        int size = ms.size();
-        JavaClass sjc = jc.getSuperClass();
-        while (sjc != null && ms.size() != 0 && inspecter.inspect(className)) {
-            //System.out.println(sjc.getClassName());
-            an(ms, sjc, className, methods);
-            sjc = sjc.getSuperClass();
-        }
-        JavaClass[] is = jc.getAllInterfaces();
-        for (int i = 0; i < is.length && ms.size() != 0 && inspecter.inspect(className); i++) {
-            if (is[i].getClassName().indexOf("Stack") != -1) {
-                //		        System.out.println(className);
-            }
-            this.an(ms, is[i], className, methods);
-        }
-
-    }
-
-    /**
-     * @param ms
-     * @param sjc
-     * @param className
-     * @param methods
-     */
-    private void an(List ms, JavaClass sjc, String className, Set methods) {
-        classes.add(sjc.getClassName());
-        for (int i = 0; i < ms.size();) {
-            //System.out.println(ms.size());
-            //System.out.println(sjc.getClassName());
-            org.apache.bcel.classfile.Method mcf = (org.apache.bcel.classfile.Method) ms
-                    .get(i);
-            Method m = new Method(className, mcf.getName(), mcf.getSignature());
-            ClassGen scg = new ClassGen(sjc);
-            if (mcf.getName().equals("<cinit>")
-                    && mcf.getSignature().equals("()V")) {
-                notProcessedMethods.add(m);
-                ms.remove(mcf);
-                continue;
-            }
-            if (mcf.getName().equals("<init>")) {
-                ms.remove(mcf);
-                continue;
-            }
-            if (scg.containsMethod(mcf.getName(), mcf.getSignature()) != null
-                    && !methods.contains(m)) {
-                //TODO
-                //System.out.println("ACHOU: " + m);
-                notProcessedMethods.add(m);
-                ms.remove(mcf);
-            } else {
-                i++;
-            }
-        }
-    }
-    /**
-     * @return Returns the methodsThatUseClassForName.
-     */
-    public Set getMethodsThatUseClassForName() {
-        return methodsThatUseClassForName;
     }
 }

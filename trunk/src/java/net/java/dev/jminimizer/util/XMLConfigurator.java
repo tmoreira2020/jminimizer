@@ -69,7 +69,6 @@ public class XMLConfigurator implements Configurator {
     public XMLConfigurator(File file) throws Exception {
         super();
         methods = new HashSet();
-        reportDiretory = new File("report");
         this.initPrimitives();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -87,6 +86,19 @@ public class XMLConfigurator implements Configurator {
                 .getElementsByTagName("inspect"));
         reNotInspect= this.buildNotInspectPattern(root.getElementsByTagName("notInspect"));
         transformationDiretory= this.buildTransformationOutput((Element)root.getElementsByTagName("output").item(0));
+        reportDiretory = this.buildReportOutput((Element)root.getElementsByTagName("report").item(0));
+    }
+    
+    private File buildReportOutput(Element eOutput) {
+    	File file;
+    	if (eOutput == null) {
+    		file= new  File("report");
+    	} else {
+    		String path= ((Element)eOutput.getFirstChild()).getAttribute("path");
+    		file= new File(path);
+    	}
+		file.mkdirs();
+    	return file;
     }
     /**
      * 
@@ -110,9 +122,7 @@ public class XMLConfigurator implements Configurator {
             } else {
                 output= new File(element.getAttribute("path"));
                 if (!output.exists()) {
-                    output= new File("output");
-                    output.mkdir();
-                    log.warn("The output file don't exist using default: " +output.getAbsolutePath());
+                	output.mkdirs();
                 }
             }
         }

@@ -351,7 +351,7 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
      */
     public void visitMethod(Method obj) {
         //System.out.println("Visitor.visitMethod");
-        System.out.println(obj);
+        //sSystem.out.println(obj);
         obj.setNameIndex(newPool.addConstant(oldPool.getConstant(obj.getNameIndex()), oldPool));
         obj.setSignatureIndex(newPool.addConstant(oldPool.getConstant(obj.getSignatureIndex()), oldPool));
         Attribute[] attributes= obj.getAttributes();

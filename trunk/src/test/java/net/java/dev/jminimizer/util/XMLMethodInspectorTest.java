@@ -2,7 +2,6 @@ package net.java.dev.jminimizer.util;
 
 
 import java.io.File;
-import java.net.URL;
 
 import junit.framework.TestCase;
 import net.java.dev.jminimizer.AllTests;

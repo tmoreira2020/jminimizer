@@ -34,6 +34,7 @@ public class AllTests {
 		suite.addTestSuite(RepositoryTest.class);
 		suite.addTestSuite(XMLMethodInspectorTest.class);
 		suite.addTestSuite(AnalyserTest.class);
+		suite.addTestSuite(MainTest.class);
 		//$JUnit-END$
 		return suite;
 	}

@@ -368,7 +368,7 @@
 		<pattern>org.w3c*</pattern>
 	</notInspect>
 	<output>
-		<file name="out.jar"/>
+		<directory path="output"/>
 	</output>
 	<report>
 		<directory path="report"/>
