@@ -13,13 +13,6 @@ public class Method extends FieldOrMethod {
 	/**
 	 *  
 	 */
-	public static String toPattern(MethodGen method) {
-		return Method.toPattern(method.getClassName(), method.getName(), method
-				.getSignature());
-	}
-	/**
-	 *  
-	 */
 	public static String toPattern(String className, String name,
 			String signature) {
 		StringBuffer buffer = new StringBuffer();
@@ -32,32 +25,10 @@ public class Method extends FieldOrMethod {
 	/**
 	 *  
 	 */
-	public static String toString(MethodGen method) {
-		return new Method(method).toString();
-	}
-	/**
-	 *  
-	 */
 	public Method(String className, String name, String[] argumentClasses,
 			String returnClass) {
 		this(className, name, Utility.methodTypeToSignature(returnClass,
 				argumentClasses));
-	}
-	/**
-	 *  
-	 */
-	public Method(MethodGen method) {
-		this(method.getClassName(), method.getName(), method.getSignature());
-		this.method = method;
-	}
-	/**
-	 *  
-	 */
-	public String getNameAndSignature() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(this.getName());
-		buffer.append(this.getSignature());
-		return buffer.toString();
 	}
 	/**
 	 *  

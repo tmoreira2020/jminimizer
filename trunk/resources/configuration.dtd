@@ -1,20 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT arguments (classType?,primitiveType?)*>
 <!ELEMENT class (constructor*,method*)>
-<!ATTLIST class 
-	name NMTOKEN #REQUIRED
-	knowTime (runtime|compiletime) #REQUIRED>
+<!ATTLIST class name NMTOKEN #REQUIRED>
 <!ELEMENT classType EMPTY>
 <!ATTLIST classType name CDATA #REQUIRED>
-<!ELEMENT configuration (inspect,notInspect?,notRemove?)>
-<!ELEMENT constructor (arguments)>
+<!ELEMENT configuration (programClasspath,runtimeClasspath?,inspect,notInspect?, output?, report?)>
 <!ELEMENT inspect (class*)>
+
+<!ELEMENT constructor (arguments)>
 <!ELEMENT method (arguments,return)>
 <!ATTLIST method name CDATA #REQUIRED>
+
 <!ELEMENT notInspect (pattern*)>
-<!ELEMENT notRemove (pattern*)>
 <!ELEMENT pattern (#PCDATA)>
+
 <!ELEMENT primitiveType EMPTY>
 <!ATTLIST primitiveType name (boolean|byte|char|int|float|long|double) #REQUIRED>
+
 <!ELEMENT return (classType|primitiveType|void)>
 <!ELEMENT void EMPTY>
+
+<!ELEMENT programClasspath (url*, directory*, fileset*)>
+<!ELEMENT runtimeClasspath (url*, directory*, fileset*)>
+
+<!ELEMENT url (#PCDATA)>
+<!ELEMENT directory EMPTY>
+<!ATTLIST directory path CDATA #REQUIRED>
+<!ELEMENT fileset (file+)>
+<!ATTLIST fileset directory CDATA #REQUIRED>
+<!ELEMENT file EMPTY>
+<!ATTLIST file name CDATA #REQUIRED>
+
+<!ELEMENT output (directory|file)>
+
+<!ELEMENT report (directory, xsl?)>
+<!ELEMENT xsl EMPTY>
+<!ATTLIST xsl path CDATA #REQUIRED
+	encoding (UTF-8|ISO8859-1|ISO8859-15) #REQUIRED>

@@ -5,7 +5,7 @@ import java.net.URL;
 import junit.framework.TestCase;
 import net.java.dev.jminimizer.util.Repository;
 import net.java.dev.jminimizer.util.URLRepository;
-import net.java.dev.jminimizer.util.XMLMethodInspector;
+import net.java.dev.jminimizer.util.XMLConfigurator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +43,7 @@ public class AnalyserTest extends TestCase {
 		URL[] program = new URL[]{new URL("file:target/test-classes/")};
 		URL[] runtime = new URL[]{};
 		Repository repo = new URLRepository(program, runtime);
-		return new Analyser(new XMLMethodInspector(new File(AllTests.TEST_PATH + "xml",
+		return new Analyser(new XMLConfigurator(new File(AllTests.TEST_PATH + "xml",
 				"AnalyserTest.xml"), repo), repo);
 	}
 }
