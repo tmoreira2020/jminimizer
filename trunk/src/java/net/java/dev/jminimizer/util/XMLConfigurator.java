@@ -461,4 +461,9 @@ public class XMLConfigurator implements Configurator {
 	public boolean isDeepStripment() {
 		return deepStripment;
 	}
+	
+    public boolean preserveResource(String resource) {
+        return true;
+    }
+
 }

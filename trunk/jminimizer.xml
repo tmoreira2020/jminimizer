@@ -363,6 +363,9 @@
 			</constructor>
 		</class>
 	</inspect>
+	<excludeResources>
+		<pattern>META-INF/*</pattern>
+	</excludeResources>
 	<notInspect>
 		<pattern>java*</pattern>
 		<pattern>org.w3c*</pattern>

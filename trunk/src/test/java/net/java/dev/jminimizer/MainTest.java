@@ -60,6 +60,14 @@ public class MainTest extends TestCase {
 		this.performTest("test11");
 	}
 	
+	public void testMain12() {
+		this.performTest("test12");
+	}
+	
+	public void testMain13() {
+		this.performTest("test13");
+	}
+	
 	private void performTest(String order) {
 		String[] args= new String[]{"-c", "src/test/xml/"+order+".xml"}; 
 		try {
