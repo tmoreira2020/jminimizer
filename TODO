@@ -1,3 +1,5 @@
 
 	-eliminar os atributos que não são utilizados (métodos que foram removidos e que agora não utilizão mais os atributos).
 	-eliminar os métodos que forão excluidos das interfaces e que agora existem classes que os contêm no entanto eles ja não existem mais nas interfaces.
+	-criar filtros para não adicionar resources (ex.: test/icons/*.gif).
+	-criar um tipo de inspect que inspeciona todas as subclasses ou classes que implementam uma determinada interface.
