@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE configuration SYSTEM "./resources/configuration.dtd">
-<configuration>
+<configuration deepStripment="true">
 	<programClasspath>
 		<directory path="./target/classes"/>
 		<fileset directory="./lib">

@@ -51,35 +51,6 @@ public class XMLMethodInspectorTest extends TestCase {
 		//test if "java.lang.Integer.<init>(I)V" method is for inspect ?
 		m= new Method("java.lang.Integer", "intValue", "()I");
 		assertFalse("Not to inspect: " + m.toString(), mi.inspect(m));
-		
-	}
-
-	public void testRemove() throws Exception {
-		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notRemove.xml"));
-		
-		//test if "dummy.Teacher.getJob()Ljava/lang/String;" method is for remove ?
-		Method m= new Method("dummy.Teacher", "getJob", "()Ljava/lang/String;");
-//		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
-		
-		//test if "dummy.Teacher.getSalary()I" method is for remove ?
-		m= new Method("dummy.Teacher", "getSalary", "()I");
-//		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
-		
-		//test if "java.lang.Object.<init>()V" method is for remove ?
-		m= new Constructor("java.lang.Object","()V");
-//		assertFalse("Not to remove: " + m.toString(), mi.remove(m));
-		
-		//test if "java.lang.Integer.<init>(I)V" method is for remove ?
-		m= new Method("java.lang.Integer", "intValue", "()I");
-		//assertTrue("To remove: " + m.toString(), mi.remove(m));
-		
-		//test if "dummy.Worker.setJob(Ljava/lang/String;)V" method is for remove ?
-		m= new Method("dummy.Worker", "setJob", "(Ljava/lang/String;)V");
-		//assertTrue("To remove: " + m.toString(), mi.remove(m));
-		
-		//test if "org.w3c.dom.Document.getDoctype()Lorg/w3c/dom/DocumentType;" method is for remove ?
-		m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;");
-		//assertFalse("Not to remove: " + m.toString(), mi.remove(m));
 	}
 	
 }

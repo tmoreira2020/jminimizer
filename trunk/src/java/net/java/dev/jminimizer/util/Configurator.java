@@ -70,5 +70,12 @@ public interface Configurator {
      *  
      */
     public boolean inspect(String className);
+    
+    /**
+     * @author Thiago Leão Moreira
+     * @since Aug 04, 2004
+     * @return
+     */
+    public boolean isDeepStripment();
 
 }
