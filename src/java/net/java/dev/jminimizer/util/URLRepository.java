@@ -107,15 +107,14 @@ public class URLRepository implements Repository {
 	public Set getProgramClasses() {
 		for (int i = 0; i < pc.length; i++) {
 			String file = pc[i].getFile();
-			if (!file.endsWith(File.separator)) {
-				throw new IllegalArgumentException(pc[i]
-						+ " must point to classpath and end with "
-						+ File.separator);
-			}
 			String protocol = pc[i].getProtocol();
 			if (protocol.equals("file")) {
 				loadClassFromDirectory(new File(file));
 			} else if (protocol.equals("jar")) {
+				if (!file.endsWith("!/")) {
+					throw new IllegalArgumentException(pc[i]
+							+ " must point to classpath and end with !/");
+				}
 				loadClassFromJar(pc[i]);
 			}
 		}
@@ -195,11 +194,15 @@ public class URLRepository implements Repository {
 			throws ClassNotFoundException {
 		//program classes
 		JavaClass jc = null;
-		String path = className.replace('.', File.separatorChar).concat(
-				".class");
 		for (int i = 0; i < pc.length; i++) {
 			URL url = null;
+			String path = className;
 			try {
+			    if (pc[i].getProtocol().equals("jar")) {
+                    path= path.replace('.', '/').concat(".class");
+                } else {
+                    path= path.replace('.', File.separatorChar).concat(".class");
+                }
 				url = new URL(pc[i], path);
 			} catch (MalformedURLException e) {
 				log.debug("Error on creating the URL", e);
@@ -209,6 +212,7 @@ public class URLRepository implements Repository {
 			try {
 				jc = this.parseClass(url.openStream(), className);
 				programClasses.put(className, jc);
+				break;
 			} catch (IOException e) {
 				log.debug("Error on reading the URL", e);
 				continue;
@@ -226,8 +230,7 @@ public class URLRepository implements Repository {
 			throws ClassNotFoundException {
 		//program classes
 		JavaClass jc = null;
-		URL url= rc.getResource(className.replace('.', '/').concat(".class"));
-		System.out.println(url);
+		//URL url= rc.getResource(className.replace('.', '/').concat(".class"));
 		InputStream in = rc.getResourceAsStream(className.replace('.','/').concat(".class"));
 		if (in == null) {
 			throw new ClassNotFoundException(className);
