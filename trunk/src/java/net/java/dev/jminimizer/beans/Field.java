@@ -22,4 +22,17 @@ public class Field extends FieldOrMethod {
 	    this(field.getDeclaringClass().getName(), field.getName(), Type.getType(field.getType()).getSignature());
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		Type ret = Type.getReturnType(this.getSignature());
+		buffer.append(ret);
+		buffer.append(' ');
+		buffer.append(this.getClassName());
+		buffer.append('.');
+		buffer.append(this.getName());
+		return buffer.toString();
+	}
 }

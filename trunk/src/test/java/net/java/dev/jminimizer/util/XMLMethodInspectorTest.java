@@ -6,7 +6,6 @@ import java.io.File;
 import junit.framework.TestCase;
 import net.java.dev.jminimizer.AllTests;
 import net.java.dev.jminimizer.beans.Constructor;
-import net.java.dev.jminimizer.beans.Method;
 import net.java.dev.jminimizer.util.MethodInspector;
 import net.java.dev.jminimizer.util.XMLMethodInspector;
 

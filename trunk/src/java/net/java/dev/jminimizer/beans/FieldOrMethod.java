@@ -106,19 +106,4 @@ public abstract class FieldOrMethod {
     private String toCompare() {
         return className + " " + name + signature;
     }
-
-    public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("[FieldOrMethod:");
-        buffer.append(" COMPARATOR: ");
-        buffer.append(COMPARATOR);
-        buffer.append(" className: ");
-        buffer.append(className);
-        buffer.append(" name: ");
-        buffer.append(name);
-        buffer.append(" signature: ");
-        buffer.append(signature);
-        buffer.append("]");
-        return buffer.toString();
-    }
 }

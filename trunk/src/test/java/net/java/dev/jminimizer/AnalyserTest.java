@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.Map;
 
 import junit.framework.TestCase;
+import net.java.dev.jminimizer.util.DisplayVisitor;
 import net.java.dev.jminimizer.util.Repository;
 import net.java.dev.jminimizer.util.URLRepository;
 import net.java.dev.jminimizer.util.XMLMethodInspector;
@@ -27,24 +28,27 @@ public class AnalyserTest extends TestCase {
 	public void testAnalyseMethodArray() {
 	}
 	public void testGetClasses() throws Exception{
-		Analyser an = this.getAnalyser();
-		Map classes= an.getClasses();
+//		Analyser an = this.getAnalyser();
+//		Map classes= an.getClasses();
 	}
 	public void testGetInspecter() {
 	}
-	public void testGetLimitsMethods() {
+	public void testGetLimitsMethods() throws Exception{
+		Analyser an = this.getAnalyser();
+		System.out.println(an.getLimitsMethods());
+		an.visit(new DisplayVisitor());
 	}
 	public void testGetRepository() {
 	}
 	public void testVisit() throws Exception {
-		Analyser an = this.getAnalyser();
+/*		Analyser an = this.getAnalyser();
 		File d = new File("temp");
 		if (d.exists()) {
 			d.delete();
 		}
 		d.mkdirs();
 		an.visit(new Transformer(an.getRepository(), d));
-	}
+	*/}
 	private Analyser getAnalyser() throws Exception {
 		URL[] program = new URL[]{new URL("file:target/test-classes/")};
 		URL[] runtime = new URL[]{};

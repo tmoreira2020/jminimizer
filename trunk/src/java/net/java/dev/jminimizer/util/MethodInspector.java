@@ -1,6 +1,5 @@
 package net.java.dev.jminimizer.util;
 
-import net.java.dev.jminimizer.beans.Method;
 
 import org.apache.bcel.generic.MethodGen;
 

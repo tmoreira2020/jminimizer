@@ -2,7 +2,6 @@ package net.java.dev.jminimizer.util;
 
 import net.java.dev.jminimizer.beans.Class;
 import net.java.dev.jminimizer.beans.Field;
-import net.java.dev.jminimizer.beans.Method;
 
 
 /**
