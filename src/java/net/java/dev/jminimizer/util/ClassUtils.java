@@ -65,7 +65,7 @@ public class ClassUtils {
 		for (int i = 0; i < chs.length; i++) {
 			ClassUtils.normalize(chs[i], buffer);
 		}
-		return buffer.toString();
+		return buffer.toString().replace('*', '.');
 	}
 
 	private static void normalize(char c, StringBuffer buffer) {
