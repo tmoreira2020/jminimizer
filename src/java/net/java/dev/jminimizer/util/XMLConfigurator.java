@@ -73,6 +73,7 @@ public class XMLConfigurator implements Configurator {
 		methods = new HashSet();
 		this.initPrimitives();
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setValidating(true);
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		DefaultHandler handler = new XMLErrorHandler();
 		builder.setErrorHandler(handler);

@@ -3,7 +3,11 @@ package net.java.dev.jminimizer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -178,8 +182,69 @@ public class Transformer implements Visitor {
 	}
 	
 	public void finish() throws IOException {
+        URL[] programsClasspath= configurator.getProgramClasspath();
+	    Set programResources= repository.getProgramResources();
+	    Iterator iterator= programResources.iterator();
 		if (out != null) {
+		    Set duplicateEntries= new HashSet();
+		    while (iterator.hasNext()) {
+	            URL resource = (URL) iterator.next();
+                String resourceString= resource.toString();
+                for (int i = 0; i < programsClasspath.length; i++) {
+                    String programClasspathString= programsClasspath[i].toString();
+                    if (resourceString.startsWith(programClasspathString)) {
+                        resourceString= resourceString.substring(programClasspathString.length());
+                        if (duplicateEntries.contains(resourceString)) {
+                            log.warn("The entry "+ resourceString + " already exist. The file "+ resource.toString()+ " will not be adds to generated program!!!");
+                            break;
+                        }
+                        duplicateEntries.add(resourceString);
+                        out.putNextEntry(new ZipEntry(resourceString));
+                        InputStream in = resource.openStream();
+                        byte[] data= new byte[1024];
+                        while (in.read(data) != -1) {
+                            out.write(data);
+                        }
+                        in.close();
+                        break;
+                    }
+                }
+	        }
 			out.finish();
+		} else {
+		    while (iterator.hasNext()) {
+	            URL resource = (URL) iterator.next();
+                String resourceString= resource.toString();
+                for (int i = 0; i < programsClasspath.length; i++) {
+                    String programClasspathString= programsClasspath[i].toString();
+                    if (resourceString.startsWith(programClasspathString)) {
+                        resourceString= resourceString.substring(programClasspathString.length());
+                        int lastIndex;
+                        if (programClasspathString.startsWith("file:")) {
+                            lastIndex= resourceString.lastIndexOf(File.separatorChar);
+                        } else {
+                            lastIndex= resourceString.lastIndexOf('/');
+                        }
+                        File directory= new File(configurator.getTransformationOutput(), resourceString.substring(0, lastIndex));
+                        if (directory.mkdirs()) {
+                        }
+                        File file= new File(directory, resourceString.substring(lastIndex+1));
+                        if (file.exists()) {
+                            log.warn("The file "+ resourceString + " already exist. The file "+ resource.toString()+ " will not be adds to generated program!!!");
+                            break;
+                        }
+                        InputStream in = resource.openStream();
+                        OutputStream out= new FileOutputStream(new File(directory, resourceString.substring(lastIndex+1)));
+                        byte[] data= new byte[1024];
+                        while (in.read(data) != -1) {
+                            out.write(data);
+                        }
+                        in.close();
+                        out.close();
+                        break;
+                    }
+                }
+	        }
 		}
 	}
 	

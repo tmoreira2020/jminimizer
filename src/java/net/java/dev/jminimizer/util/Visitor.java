@@ -10,4 +10,6 @@ public interface Visitor {
 	
 	public void visit(String className) throws Exception;
 	
+	public void finish() throws Exception;
+	
 }

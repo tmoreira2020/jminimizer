@@ -15,4 +15,10 @@ public interface Repository extends org.apache.bcel.util.Repository {
 	 */
 	public Set getProgramClasses();
 	
+	/**
+	 * Build a set with all resources that composite the program. 
+	 * @return
+	 */
+	public Set getProgramResources();
+	
 }
