@@ -91,7 +91,7 @@
     </dependencies>
     <build>
         <sourceDirectory>src/java</sourceDirectory>
-        <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+        <unitTestSourceDirectory>src/test/java</unitTestSourceDirectory>
         <unitTest>
             <includes>
                 <include>**/*Test.java</include>
@@ -99,9 +99,11 @@
         </unitTest>
 		<resources>
 			<resource>
+				<directory>resources</directory>
 				<targetPath>resources</targetPath>
 				<includes>
-					<include>resources/*</include>
+					<include>*.xsd</include>
+					<include>*.dtd</include>
 				</includes>
 			</resource>
 		</resources>

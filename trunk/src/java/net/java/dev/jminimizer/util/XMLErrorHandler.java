@@ -51,6 +51,12 @@ public class XMLErrorHandler extends DefaultHandler {
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException {
         System.out.println("systemId: "+ systemId);
-        return super.resolveEntity(publicId, systemId);
+        try {
+            return super.resolveEntity(publicId, systemId);
+		} catch (Exception e) {
+			//TODO problema com o MAVEN na hora de compilar reclama q o super lança java.io.IOException
+			e.printStackTrace();
+		}
+		return null;
     }
 }
