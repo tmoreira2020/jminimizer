@@ -430,6 +430,9 @@ public class Transformer implements Visitor {
 	 * @see net.java.dev.jminimizer.util.Visitor#visit(net.java.dev.jminimizer.beans.Class)
 	 */
 	public void visit(String className) throws Exception {
+	    if (className.indexOf("Stub") != -1) {
+	        System.out.println(className);
+	    }
 		if (classesInProgramClasspath.contains(className)) {
 		    classesUseByProgram.add(className);
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()

@@ -27,7 +27,6 @@ public class ClassUtils {
 		Method m= null;
 		do {
 		    className= clazz.getClassName();
-            //this is used to catch interfaces that has no method (just super interfaces of that has methods)
             if (configurator.inspect(className) && classesUsedByProgram.add(className)) {
             	//used just to relax de user
             	log.info("Analysing class: "+className);
@@ -38,33 +37,16 @@ public class ClassUtils {
 				log.debug("Method find: " + m);
 				return m;
 			} else {
-				if (clazz.isInterface()) {
-					String[] interfaces= clazz.getInterfaceNames();
-					for (int i = 0; i < interfaces.length; i++) {
-			            //this is used to catch interfaces that has no method (just super interfaces of that has methods)
-			            if (configurator.inspect(interfaces[i]) && classesUsedByProgram.add(interfaces[i])) {
-			            	//used just to relax de user
-			            	log.info("Analysing class: "+interfaces[i]);
-			            }
-						ClassGen inter = new ClassGen(Repository.lookupClass(interfaces[i]));
-						method= inter.containsMethod(name, signature);
-						if (method != null) {
-							m= new Method(interfaces[i], method.getName(), method.getSignature());
-							log.debug("Method find: " + m);
-							return m;
-						}
-					}
-					for (int i = 0; i < interfaces.length; i++) {
-						m= ClassUtils.findMethod(configurator, classesUsedByProgram, interfaces[i], name, signature);
-						if (m != null) {
-							log.debug("Method find: " + m);
-							return m;
-						}
+			    String[] interfaces= clazz.getInterfaceNames();
+			    for (int i = 0; i < interfaces.length; i++) {
+                    m= ClassUtils.findMethod(configurator, classesUsedByProgram, interfaces[i], name, signature);
+                    if (m != null) {
+        				log.debug("Method find: " + m);
+                        return m;
                     }
-				} else {
-					clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
-				}
+                }
 			}
+			clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
 		} while (!clazz.getClassName().equals("java.lang.Object"));
 		return m;
 	}

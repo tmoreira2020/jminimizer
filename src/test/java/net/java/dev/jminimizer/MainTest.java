@@ -68,6 +68,22 @@ public class MainTest extends TestCase {
 		this.performTest("test13");
 	}
 	
+	public void testMain14() {
+		this.performTest("test14");
+	}
+	
+	public void testMain15() {
+		this.performTest("test15");
+	}
+	
+	public void testMain16() {
+		this.performTest("test16");
+	}
+	
+	public void testMain17() {
+		this.performTest("test17");
+	}
+	
 	private void performTest(String order) {
 		String[] args= new String[]{"-c", "src/test/xml/"+order+".xml"}; 
 		try {
