@@ -53,4 +53,5 @@ A classe que efetua a transformação implementa o padrão \textit{Visitor}, assim 
 \item Será criado um método, na classe corrente, que será responsável unica e exclusivamente a carregar classes oriundas da construção \texttt{Class number= Number.class}. Este método terá acesso publico e estático com a finalidade de todas as classes da aplicação terem acesso a ele. Esta ação é tomada uma única vez. Ela ocorre na primeira vez que for encontrado um código escrito pelo compilador com a finalidade de transformar em \textit{bytecode} a construção \texttt{Class number= Number.class}. Assim que a ação se conclui o nome da classe em que foi adicionado o método é armazenado para que o 2° passo seja executado sem problemas.
 \item Será modificado o método que invoca  \textit{java.lang.Class.forName(java.lang.String className)} para que a partir de agora ele invoque o método que foi criado anteriormente.
 \end{enumerate}
+
 \end{document} 

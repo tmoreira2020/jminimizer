@@ -93,6 +93,9 @@
             <includes>
                 <include>**/*Test.java</include>
             </includes>
+            <includes>
+                <include>**/test*</include>
+            </includes>
         </unitTest>
 		<resources>
 			<resource>
