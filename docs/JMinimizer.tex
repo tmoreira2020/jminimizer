@@ -1,61 +1,170 @@
-\documentclass[a4paper,12pt]{article}% Seu arquivo fonte precisa conter
-\usepackage[brazil]{babel}           % estas quatro linhas
-\usepackage[latin1]{inputenc}        % além do comando \end{document}
-\begin{document}                     % no fim.
-Universidade Federal de Santa Catarina
-Centro Tecnológico
-Departamento de Informática e Estatística
-Bacharelado em Ciências da Computação
+\documentclass[acm]{article}
+\usepackage{verbatim}
+\usepackage[brazil]{babel}
+\usepackage[latin1]{inputenc}
+
+\title{ JMinimizer: Um Compactador de aplicações java.}
+\author{Thiago Leão Moreira}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage 
+
+\begin{abstract}
+
+O crescente aumento da popularidade da linguagem de programação Java levou também a um aumento, no desenvolvimento de frameworks e bibliotecas utilitárias, que facilitam o desenvolvimento de aplicações. No entanto estes frameworks e bibliotecas aumentam o tamanho da aplicação final, podendo até ultrapassar em muitas vezes o tamanho da aplicação que efetivamente resolve o problema de negócio. Frameworks e bibliotecas geralmente são desenvolvidos para resolver ou tratar de problemas para uma grande quantidade de situações. No entanto aplicações são criadas para resolver um problema específico, sendo assim essas aplicações não utilizam todos os recursos que um framework ou uma biblioteca oferecem. É nessas funcionalidades inúteis para a aplicação específica que o JMinimizer fará e/ou removerá as mesmas.
+\end{abstract}
+
+\newpage
+ \tableofcontents
+ \newpage
+ \listoffigures
+ \newpage
+ \listoftables
+ \newpage
+
+\section{Introdução}
+A popularidade da linguagem de programação Java\cite{java0}, principalmente para pequenos dispositivos\cite{j2me0} %COLOCAR AQUI INFO SOBRE A QTD DE CELULARES %
+ (celulares, PDA, smart phones, etc), resultou num aumento significante de bibliotecas utilitárias e frameworks que facilitam e aumentam a produtividade no desenvolvimento de aplicações para esta linguagem. Tais bibliotecas e frameworks são utilizados como infra-estrutura na solução de problemas específicos.
+Bibliotecas para logging, manipulação de documentos XML, construção de interfaces gráficas, frameworks para desenvolvimento WEB, para persistência de dados, etc\ldots são algumas aplicações que estas bibliotecas de classes possuem. 
+Sites como http://ws.apache.org, http://java.net, http://jakarta.apache.org, http://www.sf.net são web sites especializados em abrigar projetos de frameworks e bibliotecas para a linguagem Java\cite{java0}, neles são disponibilizados dezenas e até centenas de pequenos e grandes projetos destinados a facilitar o desenvolvimento de aplicações \cite{java0}, sendo ela para qualquer uma das três plataformas: J2ME. J2SE, J2EE. Poupando assim tempo e dinheiro de construir e depurar classes de infra-estrutura.
+No entanto a utilização de bibliotecas de terceiros pode acarretar num aumento do tamanho da aplicação se estas bibliotecas não tiverem disponíveis no ambiente de execução do aplicativo.
+Em conseqüência do aumento do tamanho da aplicação também aumentará o tempo para se realizar o download (se for esta a forma de distribuição do aplicativo) e aumentará o espaço necessário para acomodar a aplicação no dispositivo. Este último é de suma importância quando desenvolvemos aplicações para a plataforma J2ME, onde os dispositivos alvos podem ter somente uma pequena quantidade de espaço para o armazenamento de aplicações.
+Isto exposto verificamos que a utilização de bibliotecas de terceiros pode resolver o problema de desenvolver e depurar classes para a infra-estrutura e criar outros problemas relacionados ao armazenamento e ao tempo de obtenção da aplicação. No entanto este segundo, parece ser de mais fácil solução. Uma primeira alternativa de solução para o problema seria aumentar a capacidade de armazenamento do aparelho/dispositivo ou adquirir um aparelho/dispositivo similar com maior capacidade de armazenamento. Mas se não for possível aumentar a capacidade de armazenamento, nem de trocar de aparelho/dispositivo a segunda solução seria tentar retirar do código gerado todo o tipo de informação e estrutura que não irá afetar a execução normal do aplicativo. E é nesta segunda solução que este trabalho de conclusão de curso é baseado.
+
+\section{Fundamentação Teórica}
+O produto final do desenvolvimento de uma aplicação Java é um ou mais arquivos class, também chamados de bytecode. Cada arquivo com a extensão class representa uma classe ou interface na aplicação (FALAR SOBRE INNNERCLASS ????). Esses arquivos class são o resultado da compilação dos arquivos de código fonte, e sua estrutura é praticamente um mapeamento um para um da linguagem Java.
+É atravez desses arquivos class que analisei e fiz transformações na sua estrutura para reduzir o tamanho das aplicações Java. Uma breve explicação sobre a estrutura do bytecode se faz necessária, visto que eles são o objeto principal de estudo desse trabalho.
+
+A estrutura do bytecode
+
+Cada arquivo com a extensão class representa uma classe e ou uma interface na linguagem Java. Esses arquivos são constituídos de um array de bytes. 
+A figura acima exemplifica de maneira simples a organização e o significado de cada byte ou conjunto de bytes. O significado das representações u2 e u4 são: u representando um byte sem sinal e o decimal (1, 2 e 4) representado a quantidade de bytes. Então o valor magic é composto dos quatros primeiros bytes sem sinais do arquivo class. A seguir serão exemplificados cada uma dass estruturas que compõem o bytecode.
+
+\begin{enumerate}
+\item magic: este numero é fixo para qualquer bytecode e tem o valor 0xCAFEBABE. O objetivo desse identificador é previnir as JVMs de carregar outras coisas que não sejam classes Java.
+\item minor\_version: determina a menor versão que o bytecode suporta.
+\item major\_version: determina a maior versão que o bytecode suporta.
+\item constant\_pool\_count: determina a quantidade de constantes disponíveis no pool de constantes.
+\item constant\_pool:  estrutura que contem todas as constantes utilizadas no bytecode. Estas constantes podem ser Strings, ints, longs, doubles, etc.
+\item access\_flags:  este numero mascara os tipos de acesso que esta classes ou interface pode conter.
+\item this\_class:  é o índice no pool  de constantes que contem o nome da classe.
+\item super\_class: é o índice no pool de constantes que contem o nome da super classe.
+\item interfaces\_count: determina a quantidade de interfaces que esta classe implementa diretamente, ou o numero de interfaces que esta interface estende.
+\item interfaces:  um array contendo índices para os nomes das interfaces no pool  de constantes, que este bytecode implementa ou estende.
+\item fields\_count: determina a quantidade de campos que esta classe ou interface possui.
+\item fields: uma tabela que contem estruturas que representam um campo.
+\begin{enumerate}
+\item access\_flags:  este numero mascara os tipos de acesso que este campo pode ter.
+\item name\_index: índice no pool de constantes que contem o nome do campo.
+\item descriptor\_index: índice no pool de constantes que contem a assinatura do campo.
+\item attributes\_count: determina a quantidade de atributos que este campo possui.
+\item attributes:  tabela que contem estruturas que representam os atributos deste campo.
+\end{enumerate}
+\item methods\_count: determina a quantidade de métodos que esta classe ou interface possui.
+\item methods: tabela que contem estruturas que representam um método.
+\begin{enumerate}
+\item access\_flags:  este numero mascara os tipos de acesso que este método pode ter.
+\item name\_index: índice no pool de constantes que contem o nome do método.
+\item descriptor\_index: índice no pool de constantes que contem a assinatura do método.
+\item attributes\_count: determina a quantidade de atributos que este método possui.
+\item attributes:  tabela que contem estruturas que representam os atributos deste método.
+\end{enumerate}
+\item attributes\_count: determina a quantidade de atributos que esta classe ou interface possui.
+\item attributes: tabela que contem estruturas que representam os atributos desta classe ou interface.
+\end{enumerate}
+
+Conhecendo a fundo o bytecode pude observar quais estruturas eu poderia fazer transformações ou até mesmo retira-las para diminuir o tamanho da aplicação. 
+Na especificação da linguagem Java, está explicito que algumas das estruturas que encontramos no bytecode podem ser facilmente retiradas sem mudança no comportamento do software. A seção 4.7 de The JavaTM Virtual Machine Specification\cite[javaspec0] exemplifica que alguns atributos tanto de classe, de métodos ou de campos, podem ser retirados sem nenhum problema. Estes atributos são SourceFile, LineNumberTable, LocalVariableTable e Deprecated. Os três primeiros dizem respeito somente a informações para depuração como o arquivo de código fonte do qual foi gerado a classe ou interface, tabela que contem os números das linhas mapeados com o das instruções e uma tabela que contem as variáveis locais dos métodos. O ultimo atributo sinaliza ao desenvolvedor que a classe, o método ou o campo que possui este atributo não deve ser utilizado pois ele entrou em desuso. Geralmente quando uma estrutura é marcada como Deprecated outra estrutura assume o papel da depreciada.
+Vários compilador fornecem meios de na hora da geração do bytecode os atributos responsáveis pela depuração, serem excluídos do arquivo class. Esta é uma técnica de compactação de código Java simples e de pouco efeito colateral.
+
+(PRECISO COLOCAR ESTATISTICAS SOBRE O USO E O NÃO USO DOS ATRIBUTOS DE DEPURAÇÃO)
 
 
-Thiago Leão Moreira
 
 
 
-JMinimizer: Um Compactador de aplicações java.
+Na maioria das vezes bibliotecas Java[0] são disponibilizadas na forma de bytecode[1], que são o resultado da compilação de um código fonte Java[0]. Felizmente este tipo de representação é de alto nível e através desta representação é possível determinar hierarquias de classes, informações sobre tipos, aritmética flutuante, tabelas de variáveis locais, tabelas de numero de linhas, etc.
+É baseado no bytecode Java que as transformações e compactações são realizadas, conseqüentemente não haverá problemas na manipulação das bibliotecas de terceiros, exceto se na licença da biblioteca conter termos que proíbam modificações na mesma. Se a biblioteca não for disponibilizada na forma de bytecode e sim como código fonte basta uma simples compilação para obtermos o bytecode desejado.
+Existem alguns artifícios que podemos utilizar para diminuir ou compactar uma aplicação Java. Uma técnica muito simples e de pouco impacto é a remoção dos atributos de classe e de código dos métodos. Tabelas de variáveis locais, tabela de numero de linhas são dois exemplos de informações que estão disponíveis no bytecode Java e que podem ser descartas sem nenhum impacto em performance e comportamento da aplicação, já que estes dois atributos são utilizados para depuração. 
 
-Florianópolis (SC)
+\section{Motivação}
+O crescente números de dispositivos móveis (celulares e PDAs) e a curiosidade em relação a eles, me levaram a aprender a desenvolver programas para a plataforma J2ME. Esta plataforma de desenvolvimento que é um sub conjunto da já consagrada J2SE, oferece mecanismos para a criação de aplicações para dispositivos com pequeno poder de processamento e armazenamento. Além dessa minha curiosidade, a necessidade que a atual empresa em que trabalha em disponibilizar seu software SFA (Sales Force Automation) a maior quantidade de dispositvos e um do nossos problemas em disponibilizar o software é seu tamanha elevado, cerca de 500 kilobytes, me motivaram a desenvolver uma ferramenta que pudesse viabilizar, diminuindo o tamanho da aplicação, a distribuição de aplicações J2ME consideradas grandes para dispositivos que sem o uso dessa ferramenta, não poderiam ser feitas.
+\section{Descrição da idéia}
+Atualmente a grande quantidade de biblietocas e frameworks para a linguagem Java facilitam e diminuem o tempo de desenvolvimento de aplicações para esta linguagem. Parsers XML, frameworks de persistenência, bibliotecas de logging, são exemplos de softwares já desenvolvidos e testados que são utilizados em larga escala por outras aplicações Java. No entanto estas bibliotecas e frameworks são projetadas para abrangerem a maior quantidade de situações que um desenvolvedor possa enfretar. Muitas vezes o desenvolvedor não utiliza todos os artifícios que um bibliteca ou fgrameworks oferece, mas o código que não é utlizado também é disponibilizado juntamente com a aplicação final. Isso impacta na hora de usuário do aplicativo efetuar o download ou até impossibilitando a instalação da aplicação por falta de espaço no dispositivo, este último aspecto aplicasse a plataforma J2ME.
+Como só parte da biblioteca ou framework será necessária a aplicação, a retirada da código não utilizado diminuiria a tempo de download e apliaria a gama de dispositivos capazes de executar a aplicação.
+Uma analise estática do código já compilado da aplicação, poderá nos fornecer as classes, métodos e atributos que realmente fazem parte da aplicação e a partir desses dados eliminar tudo que não vier a ser realmente utilizado na execução do software. Assim gerando um aplicação equivalente, no entanto, menor.
+É essa a finalidade do JMinimizer, eliminar tudo que não vier a ser utilizado na execução da aplição.
+\section{Implementação da idéia}
 
-2004
+Um programa Java pode ter dois tipos de dependência relacionados a bibliotecas e frameworks de terceiros. 
+O primerio tipo de dependência está vinculado ao ambiente em que a aplicação depois de pronta será executado, e nesse artigo a identificamos como dependência do tipo \textit{runtime}. Suponhamos que estamos desenvolvendo um aplicativo para dispositivos móveis com suporte a Wireless Message API. Estes dispositivos possuem implementações das classes do pacote javax.wireless.messaging, sendo assim estas classes já estam disponiveis no ambiente de execução, no entanto para a compilação e para a analise estática do código elas são desconhecidas. Para a analise estática é preciso referencia-la, para que quando o JMinimizer começar a analiser a aplicação ele encontre todas as classes e interfaces que são referêncidas no código.
+O outro tipo de dependência não está relacionado ao ambiente de execução, no entanto também deve estar presente neste. Esse tipo de dependêcia é criada pelo desenvolvedor quando para solucionar problemas de infra estrutura tipo parsers XML, logging, persistência, este utiliza bibliotecas e/ou frameworks para resolve-los. Como esta dependência não está disponível no ambiente de execução ela deve ser disponibilizada juntamente com a aplicação. Aqui neste artigo a identificamos como dependência do tipo \textit{program}.
+Dito isto já entedemos que as dependências do tipo \textit{runtime} não precisam de nenhum tipo de tratamento, já que elas fazem parte do ambiente de execução. Já as dependências do tipo \textit{program} podem e devem ser modificadas para diminuir o tamanho final da aplicação, já que elas devem ser disponibilizadas juntamento com o software.
+
+O arquivo de configuração do JMinimizer possue secções para a devida declaração de quais bibliotecas fazem parte da dependência do tipo \textit{runtime} e do tipo \textit{program}. 
+
+Exemplo de dependêcia do tipo \textit{program}.
+
+\verbatiminput{programClasspath.xml}
+
+Também no arquivo de configuração é necessário declarar o \textit{entry point} da aplicação. Geralmente o \textit{entry point} é o método main, startApp (para Midlets) ou start (para Applets). Além do método \textit{entry point} também é necessário declarar os métodos que serão chamados pelo ambiente de execução. Exemplo disto são os métodos startApp, pauseApp e destroyApp de um Midlet.
+
+\verbatiminput{entryPoint.xml}
+
+Existe a possibilidade também de declarar pontos de parada para o JMinimizer, suponhamos que não há a necessidade de analisarmos classes do pacote \textbf{java.io}, basta para isso que declaremos no arquivo de configuração o seguinte trecho.
+
+\verbatiminput{notInspect.xml}
+
+Feito isso todas as invocações de métodos de classes pertencentes ao pacote\textbf{java.io} não serão analisadas.
+Tendo configurado as dependências os métodos que necessitam ser inspecionados e pontos de parada o JMinimizer irá método a método declarado inspecionar seu código a procura de novas invocações de métodos e acesso a atributos, tanto estáticos ou não. A medida que vai se achando novas invocações, essas chamadas de métodos e/ou atributos são adicionadas, se não pertencerem a um padrão de parada, à uma lista que contém uma única entrada para cada invocação de método ou acesso à atributo. No final do processo esta lista conterá todos os métodos e atributos que realmente compoêm o programa. Tanto métodos concretos, abstratos e nativos são adicionados a está lista, no entanto quando o JMinimizer encontra um método abstrato ou nativo ele não fará a inspeção do código, obviamente por este não o possuir.
+Durante este processo é verificado para cada novo método encontrado se este representa \textit{java.lang.Class.forName(java.lang.String className)} se sim o método que contêm a invocação deste método é adicionado a uma lista que será processada posteriormente e uma mensagem de alerta é enviada ao usuário informando-o que tal método possui invocação de \textit{java.lang.Class.forName(java.lang.String className)}. Tudo isto é feito por que a linguagem Java suporta o carregamento dinâmico de classes. Dito isto, é necessário, para uma correta analise e tranformação do código, que o usuário declare no arquivo de configuração todas as classes que eventualmente poderão ser carregadas através da invocação do método que contêm a chamada à \textit{java.lang.Class.forName(java.lang.String className)}.
+Finalizando o processo de analise, verificamos para todas as classes que foram encontradas, até então no processo, se estas classes possuem métodos que foram sobre escritos de suas classes e/ou interfaces pais. Se estas possuem métodos sobre escritos e que ainda não fazem parte da lista com todos os métodos da aplicação, estes serão adicionados a lista de métodos ainda não processados e o processo recomeçará. Ainda nessa etapa de analise é verificado para cada classe processada se está possue a invocação do método \textit{pacote.NomeDaClasse.$<$cinit$>$ ()V} que é o "construtor" padrão da classe. Esse método é invocado uma única vez após o carregamento da classe pela JVM. Ele é utilizado para setar valores a variáveis do tipo \textit{static final}.
+
+O resultado dessa etapa de analise é uma lista sem entradas repetidas com todos os métodos e atributos que fazem realmente parte da aplicação. A partir dessa lista e de uma segunda lista com todas a classes que estão disponíveis como dependências do tipo \textit{program} será feita transformações visando a diminuição do código necessario para a execução da aplicação. 
+A classe que efetua a transformação implementa o padrão \textit{Visitor}, assim sendo ela percorreá todas as classes que foram encontradas durante a etapa de analise e verificará para cada uma delas se esta possue métodos ou atributos que podem ser removidos. Se o método ou atributo poderá ser removido, num documento XML representando a classe, é adicionado uma entrada para este método ou atributo e em seguida ele é removido. Caso contrario e o método pertença a lista de métodos que invocam \textit{java.lang.Class.forName(java.lang.String className)}, é feita uma verificação no seu código para identificar se a chamada do método  \textit{java.lang.Class.forName(java.lang.String className)} foi implementada pelo desenvolvedor ou se foi um artifício usado pelo compilador para transformar a construção: \texttt{Class number= Number.class} numa chamada ao método  \textit{java.lang.Class.forName(java.lang.String className)}. Caso tenha sido o compilador que tenha produzido este código duas ações serão tomadas:
+\begin{enumerate}
+\item Será criado um método, na classe corrente, que será responsável unica e exclusivamente a carregar classes oriundas da construção \texttt{Class number= Number.class}. Este método terá acesso publico e estático com a finalidade de todas as classes da aplicação terem acesso a ele. Esta ação é tomada uma única vez. Ela ocorre na primeira vez que for encontrado um código escrito pelo compilador com a finalidade de transformar em \textit{bytecode} a construção \texttt{Class number= Number.class}. Assim que a ação se conclui o nome da classe em que foi adicionado o método é armazenado para que o 2° passo seja executado sem problemas.
+\item Será modificado o método que invoca  \textit{java.lang.Class.forName(java.lang.String className)} para que a partir de agora ele invoque o método que foi criado anteriormente.
+\end{enumerate}
+O passo seguinte na transformação é retirar os atributos \textit{Deprecated, SourceFile, LineNumberTable, LocalVariableTable, Synthetic} das classes e ou interfaces e de seus membros (métodos e campos), caso no arquivo de configuração tenha sido declarado que deve ser feita uma compactação radical. A execução desse passo deve só ser feita quando o software foi testado exaustivamente, tanto na sua forma original como na forma compactada, pois os atributos que foram removidos são utilizados para debugging e portanto a aplicação deve estar estável para sofrer uma compactação radical.
+Finalizando o processo temos a persistência da classe compactada e de todos os arquivos que estão disponíveis no classpath da dependência do tipo \textit{program} e que não são arquivos do tipo \textit{bytecode}, entre eles estão arquivos XML, figuras, etc. O programa final pode ser persistido num diretório ou em um arquivo do tipo jar {\LARGE colocar link para JAR}, essa configuração é feita no arquivo de configuração do projeto.
+\section{Estudo de caso}
+
+Inicialmente o projeto teve como alvo a plataforma J2ME, subdividindo-se em perfis e configurações. Contudo uma outra técnologia pode, facilmente, tirar proveito dos benefícios que o JMinimizer pode trazer, essa técnologia é Applet. Applets são aplicativos Java que são executados dentro dos navegadores de Internet, eles são embutidos nas páginas HTML e quando o navegador encontra uma tag que indica a existencia de um Applet o navegador invoca uma máquina virtual Java para interpretar e renderizar o Applet na página HTML. Normalmente os applets são disponibilizados na forma de um arquivo jar {\LARGE colocar link para JAR}, e este pode ser relativamente grande e levar um tempo elevado para ser totalmente recebido pelo navegador que irá renderiza-lo. A grande vantagem que o JMinimizer trará neste caso é a diminuição do tempo de recebimento do arquivo jar {\LARGE colocar link para JAR}, visto que computadores geralmente não possuem problemas de armazenamento.
+Percebido isto, vi na técnologia applet um outro campo de utilização do JMinimizer. E foi nesse outro campo que o JMinimizer foi utilizado primeiramente. 
+Bem, como todo estudante de ciências da computação que estuda e trabalha, eu também gosto de fazer alguns projetos temporários e foi num desses projetos que eu vi uma oportunidade de experimentar o JMInimizer. O projeto era um site de encontros que possuiria um chat para que os assinantes pudessem se encontrar e conversar. O chat seria uma versão mais simples dos famosos Messeger e ICQ. A primeira versão realmente foi uma versão simples de seus inspiradores {\LARGE mostrar figura com a versão}.No entanto, os proprietários do site decidiram oferecer algo mais elaborado aos seus assinantes. Decidiram que o chat deveria oferecer opções como trocar a cor da fonte das caixas de conversação e permitir que o usuário inserisse {\LARGE emoticons}, tudo isso nem perder compatibilidade com a versão 1.1 do Java, que era a versão que os sistemas operacionais Windows 2000 possuiam embutidas. Para tal esforço, foram encontradas duas soluções iniciais: a primeira seria desenvolver o chat utilizando o framework de interface gráfica chamado Thinlet, que propoe o desenvolvimento de interfaces gráficas baseadas em arquivos XML e é compativel com a versão 1.1 do Java. No entanto esse framework deixou a desejar quando comecei a tratar os eventos de teclado e por isso foi abandonado. A segunda opção era utilizar swing, mas ela foi rapidamente descartada devido a não existência de tal pacote na versão 1.1 do Java.
+A partir desse ponto iniciou-se uma pesquisa na Internet para que encontrasse um framework que suprisse nossa necessidade e tivesse compatibilidade com a versão 1.1 do Java. Com a ajuda dos sites de busca encontramos um projeto, antigo, mas que se encaixava perfeitamente nos requisitos que necessitavamos. Tal projeto é chamado de {\LARGE jp.kyasu}, e está disponivel em http://openlab.jp/kyasu/, esse projeto é uma "reescrita" dos componentes do pacote \textit{java.awt} adicionando features que só foram desenvolvidas futuramente para os componentes do pacote \textit{javax.swing}.
+No entanto, o projeto é grande para ser obtido via internet, cerca de 626 kilobytes, principalmente se considerarmos as conexões discadas. A partir desse momento encontrei uma grande chance de testar e aprimorar o JMinimizer.
+Os primeiros testes com o applet se mostraram falhos, já que a aplicação não funcionava como deveria. Isso era gerado por diversos fatores que foram arrumados ao longo do desenvolvimento do JMInimizer. Em 21/05/2004 foi gerado uma versão estável que analisava e transformava com sucesso o chat e mais ainda diminuia sensivelmente o tamanho da aplicação, tornando assim praticavel a distribuição da mesma pela internet.
+
+{\Large  construtir tabela}
+
+\begin{tabular}{|r|c||l|}
+  \hline
+    Sem transformação             &       719.692        &    \% \\
+    Com transformação             &       293.890     &    \% \\
+  \cline{1-2}
+                 &               &    \\
+                 &               &    \\
+  \cline{3-3}
+                 &               &    \\
+  \multicolumn{2}{c||}{item}     &    \\
+                 &               &    \\
+ \end{tabular}
+
+Aplicação sem transformação 719.692 bytes
+Aplicação com transformação 293.890 bytes
 
 
-\section{Texto, Comandos e Ambientes} % Este comando faz o título da seção.
+\begin{thebibliography}{99}
+  \bibitem{j2me0} http://java.sun.com/j2me
+  \bibitem{java0} http://java.sun.com
+  \bibitem{javaspec0} http://java.sun.com/docs/books/vmspec/html/VMSpecTOC.doc.html
+  \bibitem{lakatos}LAKATOS, Eva Maria; MARCONI, Marina de Andrade. Metodologia cientifica: ciencia e conhecimento cientifico, metodos cientificos, teoria, hipoteses e variaveis. São Paulo: Atlas, 1982. 231p
+ 
+ \end{thebibliography}
 
-Um arquivo fonte do \LaTeX\ contem além do texto a ser
-processado, comandos que indicam como o texto deve ser
-processado. Palavras são separadas por um ou mais espaços.
-Parágrafos são separados por uma ou mais linhas em branco. A
-saída não é afetada por espaços extras ou por linhas em
-branco extras. A maioria dos comandos do \LaTeX \ são
-iniciados com o caracter $\backslash$. Uma $\backslash$
-sozinha produz um espaço. Um ambiente é uma região do texto
-que tem um tratamento especial. Um ambiente é iniciado com\\
-\texttt{$\backslash$begin\{nome do ambiente\}} e terminado
-por  \texttt{$\backslash$end\{nome do ambiente\}}.
-
-%Aspas são digitadas assim:
-``Texto entre aspas''.
-
-%Texto em itálico deve ser digitado como:
-\textit{Isto está em itálico}.
-
-%Texto em negrito deve ser digitado como:
-\textbf{Isto está em negrito}.
-
-\subsection{Um aviso}  % Este comando faz o título da subseção.
-
-Lembre-se de não digitar nenhum dos 10 caracteres especiais
-%                &   $   #   %   _   {   }   ^   ~   \
-\& \$ \# \% \_ \{ \} \^{} \ \~{}\ $\backslash$
-exceto como um comando! Eles são impressos
-com os comandos
-%Este comando inicia um ambiente ``verbatim''(ao pé da letra)
-\begin{verbatim}
-\& \$ \# \% \_ \{ \} \^{} \~{} $\backslash$.
-
-\end{verbatim}
-
-                 %Este comando termina o ambiente ``verbatim''.
-                 %Tudo que estiver dentro deste ambiente é impresso
-                 %exatamente como é digitado
-\end{document}   % O arquivo fonte termina com este comando.
+\end{document} 

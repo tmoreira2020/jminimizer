@@ -2,17 +2,18 @@
 \usepackage{verbatim}
 \usepackage[brazil]{babel}
 \usepackage[latin1]{inputenc}
+
+\title{ JMinimizer: Um Compactador de aplicações java.}
+\author{Thiago Leão Moreira} \\
+          {\it Departamento de Informática e Estatística} }
+\date{\today}
+
 \begin{document}
-\begin{center}
-Universidade Federal de Santa Catarina\\
-Centro Tecnológico\\
-Departamento de Informática e Estatística\\
-Bacharelado em Ciências da Computação\\[5cm]
-Thiago Leão Moreira\\[5cm]
-JMinimizer: Um Compactador de aplicações java.\\[3cm]
-Florianópolis (SC)\\[3cm]
-2004\\
-\end{center}
+\maketitle
+\begin{abstract}
+
+O crescente aumento da popularidade da linguagem de programação Java levou também a um aumento, no desenvolvimento de frameworks e bibliotecas utilitárias, que facilitam o desenvolvimento de aplicações. No entanto estes frameworks e bibliotecas aumentam o tamanho da aplicação final, podendo até ultrapassar em muitas vezes o tamanho da aplicação que efetivamente resolve o problema de negócio. Frameworks e bibliotecas geralmente são desenvolvidos para resolver ou tratar de problemas para uma grande quantidade de situações. No entanto aplicações são criadas para resolver um problema específico, sendo assim essas aplicações não utilizam todos os recursos que um framework ou uma biblioteca oferecem. É nessas funcionalidades inúteis para a aplicação específica que o JMinimizer fará e/ou removerá as mesmas.
+\end{abstract}
 
 \section{Motivação}
 O crescente números de dispositivos móveis (celulares e PDAs) e a curiosidade em relação a eles, me levaram a aprender a desenvolver programas para a plataforma J2ME. Esta plataforma de desenvolvimento que é um sub conjunto da já consagrada J2SE, oferece mecanismos para a criação de aplicações para dispositivos com pequeno poder de processamento e armazenamento. Além dessa minha curiosidade, a necessidade que a atual empresa em que trabalha em disponibilizar seu software SFA (Sales Force Automation) a maior quantidade de dispositvos e um do nossos problemas em disponibilizar o software é seu tamanha elevado, cerca de 500 kilobytes, me motivaram a desenvolver uma ferramenta que pudesse viabilizar, diminuindo o tamanho da aplicação, a distribuição de aplicações J2ME consideradas grandes para dispositivos que sem o uso dessa ferramenta, não poderiam ser feitas.

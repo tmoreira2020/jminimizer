@@ -1,5 +1,8 @@
 package dummy;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * @author Thiago Leão Moreira
@@ -7,6 +10,10 @@ package dummy;
  *  
  */
 public class Main {
+	/**
+	 * Logger for this class
+	 */
+	private static final Log log = LogFactory.getLog(Main.class);
 
 //	private static final Log log = LogFactory.getLog(Main.class);
 
@@ -15,6 +22,8 @@ public class Main {
 		w.getName();
 //		w.getSalary();
 		System.out.println(w.getJob());
+		
+		
 	}
 
 }
