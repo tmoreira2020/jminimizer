@@ -74,7 +74,7 @@ public class RepositoryTest extends TestCase {
     }
     
     private Repository getRepository() throws Exception {
-        return new Repository(new URL[]{new URL("file:src/test/class/")}, new URL[0]);
+        return new URLRepository(new URL[]{new URL("file:src/test/class/")}, new URL[0]);
     }
 
 }
