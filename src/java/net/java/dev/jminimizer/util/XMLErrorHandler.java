@@ -51,6 +51,7 @@ public class XMLErrorHandler extends DefaultHandler {
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException {
         System.out.println("systemId: "+ systemId);
+        
         try {
             return super.resolveEntity(publicId, systemId);
 		} catch (Exception e) {

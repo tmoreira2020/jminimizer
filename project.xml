@@ -17,7 +17,7 @@
     <url>https://jminimizer.dev.java.net/</url>
     <repository>
         <connection>scm:cvs:pserver:guest@cvs.dev.java.net:/cvs:jminimizer</connection>
-        <developerConnection>scm:cvs:pserver:DEVELOPER_ID:cvs.dev.java.net:/cvs:jminimizer</developerConnection>
+        <developerConnection>scm:cvs:pserver:DEVELOPER_ID@cvs.dev.java.net:/cvs:jminimizer</developerConnection>
         <url>https://jminimizer.dev.java.net/source/browse/jminimizer/</url>
     </repository>
     <mailingLists>
@@ -63,7 +63,6 @@
             <version>5.1</version>
             <type>jar</type>
             <url>http://jakarta.apache.org/bcel/</url>
-            <properties/>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -71,7 +70,6 @@
             <version>1.0.3</version>
             <type>jar</type>
             <url>http://jakarta.apache.org/commons/logging/</url>
-            <properties/>
         </dependency>
         <dependency>
             <groupId>regexp</groupId>
@@ -79,7 +77,6 @@
             <version>1.3</version>
             <type>jar</type>
             <url>http://jakarta.apache.org/regexp/</url>
-            <properties/>
         </dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>
