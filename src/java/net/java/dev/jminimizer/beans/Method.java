@@ -9,6 +9,8 @@ import org.apache.bcel.generic.Type;
  *  
  */
 public class Method extends FieldOrMethod {
+	
+	private MethodGen method;
 	/**
 	 *  
 	 */
@@ -48,17 +50,11 @@ public class Method extends FieldOrMethod {
 	}
 	/**
 	 *  
-	 *
-	public Method(java.lang.reflect.Method method) {
-		this(method.getDeclaringClass(), method.getName(), method
-				.getParameterTypes(), method.getReturnType(), false);
-	}
-	/**
-	 *  
 	 */
 	public Method(MethodGen method) {
 		this(method.getClassName(), method.getName(), method.getSignature(),
 				false);
+		this.method= method;
 	}
 	/**
 	 *  
@@ -98,9 +94,12 @@ public class Method extends FieldOrMethod {
 	 *  
 	 */
 	public MethodGen toMethodGen() throws ClassNotFoundException {
-		ClassGen clazz = new ClassGen(Repository.lookupClass(className));
-		return new MethodGen(this.toClassFileMethod(), className, clazz
-				.getConstantPool());
+		if (method == null) {
+			ClassGen clazz = new ClassGen(Repository.lookupClass(className));
+			method= new MethodGen(this.toClassFileMethod(), className, clazz
+					.getConstantPool());
+		}
+		return method;
 	}
 	/**
 	 *  
