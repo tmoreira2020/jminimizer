@@ -37,13 +37,6 @@ public abstract class FieldOrMethod {
 		this.setSignature(signature);
 	}
 
-	/**
-     *  
-     */
-    protected FieldOrMethod() {
-        super();
-    }
-
     /**
      * Returns <code>true</code> if this <code>FieldOrMethod</code> is the
      * same as the o argument.

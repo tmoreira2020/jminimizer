@@ -42,7 +42,7 @@ public class XMLErrorHandler extends DefaultHandler {
         String location= "The xml file: " + id + " has a fatal error at line: " +
         exception.getLineNumber() + " and column: " + exception.getColumnNumber() + " the error message is: \n";
         location+= exception.getMessage();
-        log.fatal(location);
+        log.fatal(location, exception);
         System.exit(0);
     }
 
@@ -67,6 +67,6 @@ public class XMLErrorHandler extends DefaultHandler {
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException {
         return new InputSource(this.getClass().getResourceAsStream(
-                "/resources/configuration.dtd"));
+        "/resources/configuration.dtd"));
     }
 }

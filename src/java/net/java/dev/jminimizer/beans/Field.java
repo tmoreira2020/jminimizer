@@ -3,16 +3,20 @@ package net.java.dev.jminimizer.beans;
 import org.apache.bcel.generic.Type;
 
 /**
- * @author Thiago Leão Moreira <thiago.leao.moreira@terra.com.br>
+ * @author Thiago Leão Moreira <thiagolm@dev.java.net>
  * 
  */
 public class Field extends FieldOrMethod {
-
-	
-	public Field(java.lang.reflect.Field field) {
-	    super(field.getDeclaringClass().getName(), field.getName(), Type.getType(field.getType()).getSignature());
+	/**
+	 * @param className
+	 * @param name
+	 * @param signature
+	 */
+	public Field(String className, String name, String signature) {
+		super(className, name, signature);
 	}
 
+	
 	/**
 	 * @see java.lang.Object#toString()
 	 */
@@ -25,13 +29,5 @@ public class Field extends FieldOrMethod {
 		buffer.append('.');
 		buffer.append(this.getName());
 		return buffer.toString();
-	}
-	/**
-	 * @param className
-	 * @param name
-	 * @param signature
-	 */
-	public Field(String className, String name, String signature) {
-		super(className, name, signature);
 	}
 }

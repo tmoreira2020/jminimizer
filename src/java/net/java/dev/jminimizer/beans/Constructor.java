@@ -1,11 +1,18 @@
 package net.java.dev.jminimizer.beans;
 import org.apache.bcel.generic.Type;
 /**
- * @author Thiago Leão Moreira
+ * @author Thiago Leão Moreira <thiagolm@dev.java.net>
  * @since Apr 13, 2004
  *  
  */
 public class Constructor extends Method {
+	/**
+	 * @param className
+	 * @param signature
+	 */
+	public Constructor(String className, String signature) {
+		super(className, "<init>", signature);
+	}
 	
 	/**
 	 * @param className
@@ -14,13 +21,6 @@ public class Constructor extends Method {
 	public Constructor(String className,
 			String[] argumentClasses) {
 		super(className, "<init>", argumentClasses, "void");
-	}
-	/**
-	 * @param className
-	 * @param signature
-	 */
-	public Constructor(String className, String signature) {
-		super(className, "<init>", signature);
 	}
 	/**
 	 * @see java.lang.Object#toString()

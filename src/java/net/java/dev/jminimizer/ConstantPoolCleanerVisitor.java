@@ -356,8 +356,9 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
     }
     
     public JavaClass cleanUpClassGen(ClassGen classGen) {
+    	String className= classGen.getClassName();
     	oldPool= classGen.getConstantPool();
-    	ClassGen newClassGen= new ClassGen(classGen.getClassName(), classGen.getSuperclassName(), classGen.getFileName(), classGen.getAccessFlags(), classGen.getInterfaceNames(), newPool);
+    	ClassGen newClassGen= new ClassGen(className, classGen.getSuperclassName(), classGen.getFileName(), classGen.getAccessFlags(), classGen.getInterfaceNames(), newPool);
     	Attribute[] attributes= classGen.getAttributes();
     	for (int i = 0; i < attributes.length; i++) {
 			attributes[i].accept(this);
@@ -369,9 +370,12 @@ public class ConstantPoolCleanerVisitor implements org.apache.bcel.classfile.Vis
             	methods[i].setNameIndex(newPool.addConstant(oldPool.getConstant(methods[i].getNameIndex()), oldPool));
             	methods[i].setSignatureIndex(newPool.addConstant(oldPool.getConstant(methods[i].getSignatureIndex()), oldPool));
         	} else {
-	            MethodGen methodGen= new MethodGen(methods[i], classGen.getClassName(), oldPool).copy(classGen.getClassName(), newPool);
-	            methodGen.stripAttributes(deepStripment);
+	            MethodGen methodGen= new MethodGen(methods[i], className, oldPool);
+	            methodGen= methodGen.copy(className, newPool);
+				methodGen.addCodeAttribute(methodGen.getLineNumberTable(newPool));
+				methodGen.addCodeAttribute(methodGen.getLocalVariableTable(newPool));
 	            if (deepStripment) {
+		            methodGen.stripAttributes(deepStripment);
 					attributes= methodGen.getAttributes();
 					for (int j = 0; j < attributes.length; j++) {
 						if (attributes[j] instanceof Synthetic || attributes[j] instanceof Deprecated) {
