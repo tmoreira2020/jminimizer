@@ -1,4 +1,4 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[acm]{article}
 \usepackage{verbatim}
 \usepackage[brazil]{babel}
 \usepackage[latin1]{inputenc}
@@ -14,19 +14,14 @@ Florianópolis (SC)\\[3cm]
 2004\\
 \end{center}
 
-\begin{section}
-Motivação
+\section{Motivação}
 O crescente números de dispositivos móveis (celulares e PDAs) e a curiosidade em relação a eles, me levaram a aprender a desenvolver programas para a plataforma J2ME. Esta plataforma de desenvolvimento que é um sub conjunto da já consagrada J2SE, oferece mecanismos para a criação de aplicações para dispositivos com pequeno poder de processamento e armazenamento. Além dessa minha curiosidade, a necessidade que a atual empresa em que trabalha em disponibilizar seu software SFA (Sales Force Automation) a maior quantidade de dispositvos e um do nossos problemas em disponibilizar o software é seu tamanha elevado, cerca de 500 kilobytes, me motivaram a desenvolver uma ferramenta que pudesse viabilizar, diminuindo o tamanho da aplicação, a distribuição de aplicações J2ME consideradas grandes para dispositivos que sem o uso dessa ferramenta, não poderiam ser feitas.
-\end{section} 
-\begin{section}
-Descrição da idéia
+\section{Descrição da idéia}
 Atualmente a grande quantidade de biblietocas e frameworks para a linguagem Java facilitam e diminuem o tempo de desenvolvimento de aplicações para esta linguagem. Parsers XML, frameworks de persistenência, bibliotecas de logging, são exemplos de softwares já desenvolvidos e testados que são utilizados em larga escala por outras aplicações Java. No entanto estas bibliotecas e frameworks são projetadas para abrangerem a maior quantidade de situações que um desenvolvedor possa enfretar. Muitas vezes o desenvolvedor não utiliza todos os artifícios que um bibliteca ou fgrameworks oferece, mas o código que não é utlizado também é disponibilizado juntamente com a aplicação final. Isso impacta na hora de usuário do aplicativo efetuar o download ou até impossibilitando a instalação da aplicação por falta de espaço no dispositivo, este último aspecto aplicasse a plataforma J2ME.
 Como só parte da biblioteca ou framework será necessária a aplicação, a retirada da código não utilizado diminuiria a tempo de download e apliaria a gama de dispositivos capazes de executar a aplicação.
 Uma analise estática do código já compilado da aplicação, poderá nos fornecer as classes, métodos e atributos que realmente fazem parte da aplicação e a partir desses dados eliminar tudo que não vier a ser realmente utilizado na execução do software. Assim gerando um aplicação equivalente, no entanto, menor.
 É essa a finalidade do JMinimizer, eliminar tudo que não vier a ser utilizado na execução da aplição.
-\end{section}
-\begin{section}
-Implementação da idéia
+\section{Implementação da idéia}
 
 Um programa Java pode ter dois tipos de dependência relacionados a bibliotecas e frameworks de terceiros. 
 O primerio tipo de dependência está vinculado ao ambiente em que a aplicação depois de pronta será executado, e nesse artigo a identificamos como dependência do tipo \textit{runtime}. Suponhamos que estamos desenvolvendo um aplicativo para dispositivos móveis com suporte a Wireless Message API. Estes dispositivos possuem implementações das classes do pacote javax.wireless.messaging, sendo assim estas classes já estam disponiveis no ambiente de execução, no entanto para a compilação e para a analise estática do código elas são desconhecidas. Para a analise estática é preciso referencia-la, para que quando o JMinimizer começar a analiser a aplicação ele encontre todas as classes e interfaces que são referêncidas no código.
@@ -53,6 +48,8 @@ Durante este processo é verificado para cada novo método encontrado se este repr
 Finalizando o processo de analise, verificamos para todas as classes que foram encontradas, até então no processo, se estas classes possuem métodos que foram sobre escritos de suas classes e/ou interfaces pais. Se estas possuem métodos sobre escritos e que ainda não fazem parte da lista com todos os métodos da aplicação, estes serão adicionados a lista de métodos ainda não processados e o processo recomeçará. Ainda nessa etapa de analise é verificado para cada classe processada se está possue a invocação do método \textit{pacote.NomeDaClasse.\< cinit \> ()V} que é o "construtor" padrão da classe. Esse método é invocado uma única vez após o carregamento da classe pela JVM. Ele é utilizado para setar valores a variáveis do tipo \textit{static final}.
 
 O resultado dessa etapa de analise é uma lista sem entradas repetidas com todos os métodos e atributos que fazem realmente parte da aplicação. A partir dessa lista e de uma segunda lista com todas a classes que estão disponíveis como dependências do tipo \textit{program} será feita transformações visando a diminuição do código necessario para a execução da aplicação. 
-A classe que efetua a transformação implementa o padrão \textit{Visitor}, assim sendo ela percorreá todas as classes que foram encontradas durante a etapa de analise e verificará para cada uma delas se esta possue métodos ou atributos que podem ser removidos. Se o método ou atributo poderá ser removido, num documento XML representando a classe, é adicionado uma entrada para este método ou atributo e em seguida ele é removido. Caso contrario e o método pertença a lista de métodos que invocam \textit{java.lang.Class.forName(java.lang.String className)}, é feita uma verificação
-\end{section}
+A classe que efetua a transformação implementa o padrão \textit{Visitor}, assim sendo ela percorreá todas as classes que foram encontradas durante a etapa de analise e verificará para cada uma delas se esta possue métodos ou atributos que podem ser removidos. Se o método ou atributo poderá ser removido, num documento XML representando a classe, é adicionado uma entrada para este método ou atributo e em seguida ele é removido. Caso contrario e o método pertença a lista de métodos que invocam \textit{java.lang.Class.forName(java.lang.String className)}, é feita uma verificação no seu código para identificar se a chamada do método  \textit{java.lang.Class.forName(java.lang.String className)} foi implementada pelo desenvolvedor ou se foi um artifício usado pelo compilador para transformar a construção: \verbatiminput{classLoad.java} numa chamada ao método  \textit{java.lang.Class.forName(java.lang.String className)}. Caso tenha sido o compilador que tenha produzido este código duas ações serão tomadas:
+1° Será criado um método, na classe corrente, que será responsável unica e exclusivamente a carregar classes oriundas da construção \verbatiminput{classLoad.java}. Este método terá acesso publico e estático com a finalidade de todas as classes da aplicação terem acesso a ele. Esta ação é tomada uma única vez. Ela ocorre na primeira vez que for encontrado um código escrito pelo compilador com a finalidade de transformar em \textit{bytecode} a construção \verbatiminput{classLoad.java}. Assim que a ação se conclui o nome da classe em que foi adicionado o método é armazenado para que o 2° passo seja executado sem problemas.
+2° Será modificado o método que invoca  \textit{java.lang.Class.forName(java.lang.String className)} para que a partir de agora ele invoque o método que foi criado anteriormente.
+
 \end{document} 
