@@ -18,12 +18,8 @@ import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import net.java.dev.jminimizer.beans.Field;
-
 import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.Type;
 import org.apache.bcel.util.ClassPath;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -147,20 +143,6 @@ public class URLRepository implements Repository {
 		return jc;
 	}
 	/**
-	 * @see net.java.dev.jminimizer.util.Repository#loadClass(java.lang.String,
-	 *      boolean)
-	 */
-	public net.java.dev.jminimizer.beans.Class loadClass(String className,
-			boolean loadMembers) throws ClassNotFoundException {
-		JavaClass jc = this.loadClass(className);
-		net.java.dev.jminimizer.beans.Class clazz = new net.java.dev.jminimizer.beans.Class(
-				jc.getClassName());
-		if (loadMembers) {
-			this.loadMembers(clazz, jc);
-		}
-		return clazz;
-	}
-	/**
 	 * 
 	 * @param directory
 	 */
@@ -201,33 +183,6 @@ public class URLRepository implements Repository {
 			}
 		} catch (IOException e) {
 			//never here
-		}
-	}
-	/**
-	 * 
-	 * @param clazz
-	 * @param jc
-	 * @throws ClassNotFoundException
-	 */
-	private void loadMembers(net.java.dev.jminimizer.beans.Class clazz,
-			JavaClass jc) throws ClassNotFoundException {
-		String className = clazz.getName();
-		Method[] ms = jc.getMethods();
-		for (int i = 0; i < ms.length; i++) {
-			clazz.add(new net.java.dev.jminimizer.beans.Method(className, ms[i]
-					.getName(), Type.getMethodSignature(ms[i].getReturnType(),
-					ms[i].getArgumentTypes())));
-		}
-		org.apache.bcel.classfile.Field[] fs = jc.getFields();
-		for (int i = 0; i < fs.length; i++) {
-			clazz.add(new Field(className, fs[i].getName(), fs[i]
-					.getSignature()));
-		}
-		JavaClass sjc = jc.getSuperClass();
-		if (sjc != null) {
-			net.java.dev.jminimizer.beans.Class superClass = new net.java.dev.jminimizer.beans.Class(
-					sjc.getClassName());
-			clazz.addSuperClass(superClass);
 		}
 	}
 	/**

@@ -24,5 +24,5 @@ public interface Repository extends org.apache.bcel.util.Repository {
 	 * @return
 	 * @throws ClassNotFoundException
 	 */
-	public Class loadClass(String className, boolean loadMembers) throws ClassNotFoundException;
+	//public Class loadClass(String className, boolean loadMembers) throws ClassNotFoundException;
 }

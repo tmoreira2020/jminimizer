@@ -1,6 +1,5 @@
 package net.java.dev.jminimizer.util;
 
-import net.java.dev.jminimizer.beans.Class;
 
 
 /**
@@ -9,6 +8,6 @@ import net.java.dev.jminimizer.beans.Class;
  */
 public interface Visitor {
 	
-	public void visit(Class clazz);
+	public void visit(String className) throws Exception;
 	
 }
