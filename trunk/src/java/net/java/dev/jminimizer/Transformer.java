@@ -238,7 +238,7 @@ public class Transformer implements Visitor {
             }
             this.updateClassGen(cg);
             cg.update();
-            cg.getJavaClass().accept(new ConstantPoolCleanerVisitor());
+            //cg.getJavaClass().accept(new ConstantPoolCleanerVisitor());
             this.dump(cg.getJavaClass());
             if (eClazz.hasChildNodes()) {
                 File directory = configurator.getReportDirectory();
