@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.java.dev.jminimizer.beans.Constructor;
+import net.java.dev.jminimizer.beans.Method;
 
 import org.apache.bcel.generic.MethodGen;
 import org.apache.commons.logging.Log;
