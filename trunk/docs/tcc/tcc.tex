@@ -1,0 +1,67 @@
+\documentclass{inetese}
+\usepackage{isolatin1}       %para os acentos iso
+\usepackage{graphicx}        %incluir figuras encapsulated postscript
+\usepackage{babel}
+
+\ineTitulo{JMinimizer: Um Compactador de aplicações java.}
+
+\ineAutor{Thiago Leão Moreira}
+\ineOrientador{Prof. Dr. Antônio Augusto Medeiros Fröhlich}
+
+\ineAreaConcentracao{Ferramentas de desenvolvimento}
+\ineTipoTese{dissertação}
+
+\ineGrau{Bacharel}
+\ineMes{Novembro}
+\ineAno{2004}
+
+\ineCoordenadorCurso{Prof. Dr. José Mazzucco Junior}
+\ineMembroBancaA{Prof. Dr. Luiz Carlos Zancanella}
+\ineMembroBancaB{M. Sc. Tiago Stein D\'Agostini}
+
+\begin{document}
+
+\inePaginaDeRosto
+\inePaginaDeAprovacao
+
+\begin{ineEpigrafe}
+``A verdadeira função do homem é viver \\
+  e não apenas existir.''\\
+- Jack London
+\end{ineEpigrafe}
+
+\begin{ineOferecimento}
+  ``A mim, pelas noite não dorminadas...''
+\end{ineOferecimento}
+
+%\begin{ineAgradecimentos}
+%  Agradecimentos...
+%\end{ineAgradecimentos}
+
+\begin{ineResumo}
+O crescente aumento da popularidade da linguagem de programação Java levou também a um aumento, no desenvolvimento de frameworks e bibliotecas utilitárias, que facilitam o desenvolvimento de aplicações. No entanto estes frameworks e bibliotecas aumentam o tamanho da aplicação final, podendo até ultrapassar em muitas vezes o tamanho da aplicação que efetivamente resolve o problema de negócio. Frameworks e bibliotecas geralmente são desenvolvidos para resolver ou tratar de problemas para uma grande quantidade de situações. No entanto aplicações são criadas para resolver um problema específico, sendo assim essas aplicações não utilizam todos os recursos que um framework ou uma biblioteca oferecem. É nessas funcionalidades inúteis para a aplicação específica que o JMinimizer fará e/ou removerá as mesmas.
+
+  \paragraph{Keywords:} Java, J2ME, celular, PDA's.
+\end{ineResumo}
+                                                                                                                            
+\begin{abstract}
+  Abstract
+  \paragraph{Keywords:} Java, J2ME, celular, PDA's.
+\end{abstract}
+
+% Insere o Sumário
+\tableofcontents    \clearpage
+                                                                                                                            
+% Insere a lista de Figuras e de Tabelas
+\listoffigures \clearpage
+%\listoftables \clearpage
+
+\include{Introducao}
+\include{FundamentosTeoricos}
+
+\renewcommand\bibname{Referências Bibliográficas}
+\bibliographystyle{abnt} % Estilo para gerar referências em conformidade com
+                         % as normas brasileiras
+\bibliography{tcc}
+
+\end{document}
