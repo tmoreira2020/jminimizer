@@ -88,15 +88,17 @@ public class Analyser {
             notProcessedMethods.clear();
             this.analyse(methods, usedMethods);
         }
-        //System.out.println(runtimeClassLoaderMethods.size());
+        System.out.println("RUNTIME class: " +runtimeClassLoaderMethods.size());
     }
     
     private void proc(Method method) {
             try {
+                System.out.println(method);
                 MethodGen mg= method.toMethodGen();
                 Attribute[] a= mg.getAttributes();
                 for (int i = 0; i < a.length; i++) {
-                    if (a[i] instanceof Synthetic) {
+                    if (a[i] instanceof Synthetic && method.getName().equals(Transformer.METHOD_SYNTHETIC_NAME)) {
+                        System.out.println("É O CARA");
                         return;
                     }
                 }
