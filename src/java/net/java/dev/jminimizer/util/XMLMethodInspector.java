@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.java.dev.jminimizer.beans.Constructor;
-import net.java.dev.jminimizer.beans.Method;
 
 import org.apache.bcel.generic.MethodGen;
 import org.apache.commons.logging.Log;
@@ -95,12 +94,12 @@ public class XMLMethodInspector implements MethodInspector {
 			int m = ms.length;
 			if (m == 0) {
 				buffer.append("\\b");
-				buffer.append(Method.normalize(clazz.getName()));
+				buffer.append(ClassUtils.normalize(clazz.getName()));
 				buffer.append("*");
 			} else {
 				for (int j = 0; j < m; j++) {
 					buffer.append("\\b");
-					buffer.append(ms[j].toPattern());
+					buffer.append(ClassUtils.normalize(ms[j].toPattern()));
 					buffer.append("\\b");
 					if (j != (m - 1)) {
 						buffer.append('|');
@@ -118,7 +117,7 @@ public class XMLMethodInspector implements MethodInspector {
 		}
 		for (int i = 0; i < n; i++) {
 			buffer.append(
-				Method.normalize(list.item(i).getFirstChild().getNodeValue()));
+				ClassUtils.normalize(list.item(i).getFirstChild().getNodeValue()));
 			if (i != (n - 1)) {
 				buffer.append('|');
 			}
@@ -196,7 +195,7 @@ public class XMLMethodInspector implements MethodInspector {
 	 * @see net.java.dev.jminimizer.util.MethodInspecter#inspect(org.apache.bcel.generic.MethodGen)
 	 */
 	public boolean inspect(MethodGen method) {
-		String s= Method.toString(method);
+		String s= Method.toPattern(method);
 		boolean b= !reNotInspect.match(s); 
 		log.debug("Inspect " + s + " ? = " + b);
 		return b;
@@ -231,7 +230,7 @@ public class XMLMethodInspector implements MethodInspector {
 			}
 		}
 		//test if this method is in a pattern
-		return !reNotRemove.match(Method.toString(method));
+		return !reNotRemove.match(Method.toPattern(method));
 	}
 
 

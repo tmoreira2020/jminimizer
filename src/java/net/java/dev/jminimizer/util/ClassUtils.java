@@ -1,5 +1,6 @@
 package net.java.dev.jminimizer.util;
 
+
 import org.apache.bcel.Repository;
 import org.apache.bcel.generic.ClassGen;
 import org.apache.bcel.generic.FieldGen;
@@ -56,6 +57,24 @@ public class ClassUtils {
 			clazz = new ClassGen(Repository.lookupClass(clazz.getSuperclassName()));
 		} while (clazz != null);
 		return null;
+	}
+
+	public static String normalize(String string) {
+		StringBuffer buffer = new StringBuffer(string);
+		char[] chs = {'.', '(', ')', '$'};
+		for (int i = 0; i < chs.length; i++) {
+			ClassUtils.normalize(chs[i], buffer);
+		}
+		return buffer.toString();
+	}
+
+	private static void normalize(char c, StringBuffer buffer) {
+		String ch = "" + c;
+		int i = buffer.indexOf(ch);
+		while (i != -1) {
+			buffer.insert(i, '\\');
+			i = buffer.indexOf(ch, i + 2);
+		}
 	}
 
 }

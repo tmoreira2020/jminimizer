@@ -3,6 +3,8 @@ package net.java.dev.jminimizer.beans;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.java.dev.jminimizer.util.*;
+
 /**
  * @author Thiago Leão Moreira <thiago.leao.moreira@terra.com.br>
  *  
@@ -47,6 +49,9 @@ public class Class {
 
     public void add(Method method) {
         if (method.getClassName().equals(name)) {
+        	if (method.getName().equals("<init>")) {
+        		method= new Constructor(method.getClassName(), method.getSignature());
+			}
             methods.add(method);
         } else {
             throw new IllegalArgumentException(

@@ -1,5 +1,8 @@
 package dummy;
 
+import java.io.File;
+import java.lang.reflect.Array;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,6 +20,10 @@ public class Teacher extends Worker {
 	 */
 	public Teacher(Teacher t) {
 		super(t);
+		new Integer(3);
+		new String();
+		new File("");
+		Array.newInstance(int.class, 23);
 	}
 
 	/**
