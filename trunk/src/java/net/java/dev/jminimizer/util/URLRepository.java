@@ -226,8 +226,9 @@ public class URLRepository implements Repository {
 			throws ClassNotFoundException {
 		//program classes
 		JavaClass jc = null;
-		InputStream in = rc.getResourceAsStream(className.replace('.',
-				File.separatorChar).concat(".class"));
+		URL url= rc.getResource(className.replace('.', '/').concat(".class"));
+		System.out.println(url);
+		InputStream in = rc.getResourceAsStream(className.replace('.','/').concat(".class"));
 		if (in == null) {
 			throw new ClassNotFoundException(className);
 		}
