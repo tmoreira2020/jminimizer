@@ -10,9 +10,9 @@ public class Constructor extends Method {
 	 * @param className
 	 * @param argumentClasses
 	 */
-	public Constructor(java.lang.Class className,
-			java.lang.Class[] argumentClasses) {
-		super(className, "<init>", argumentClasses, void.class, false);
+	public Constructor(String className,
+			String[] argumentClasses) {
+		super(className, "<init>", argumentClasses, "void", false);
 	}
 	/**
 	 * @param className

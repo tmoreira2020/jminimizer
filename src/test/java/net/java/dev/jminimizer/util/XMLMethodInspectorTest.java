@@ -2,6 +2,7 @@ package net.java.dev.jminimizer.util;
 
 
 import java.io.File;
+import java.net.URL;
 
 import junit.framework.TestCase;
 import net.java.dev.jminimizer.AllTests;
@@ -18,7 +19,7 @@ public class XMLMethodInspectorTest extends TestCase {
 	public static final String XML_TEST_PATH = AllTests.TEST_PATH + "xml" + File.separator;
 
 	public void testGetMethodsToInspect() throws Exception{
-		MethodInspector mi = new XMLMethodInspector(XML_TEST_PATH + "XMLMethodInspectorTest-inspect.xml");
+		MethodInspector mi = new XMLMethodInspector(XML_TEST_PATH + "XMLMethodInspectorTest-inspect.xml", this.getRepository());
 		Method[] ms = mi.getMethodsToInspect();
 		//check if amount of method/constructor is three
 		assertEquals(3, ms.length);
@@ -38,7 +39,7 @@ public class XMLMethodInspectorTest extends TestCase {
 	}
 	
 	public void testInspect() throws Exception{
-		MethodInspector mi = new XMLMethodInspector(XML_TEST_PATH + "XMLMethodInspectorTest-notInspect.xml");
+		MethodInspector mi = new XMLMethodInspector(XML_TEST_PATH + "XMLMethodInspectorTest-notInspect.xml", this.getRepository());
 		
 		//test if "org.w3c.dom.Document.getDoctype()Lorg/w3c/dom/DocumentType;" method is for inspect ?
 		Method m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;", false);
@@ -58,7 +59,7 @@ public class XMLMethodInspectorTest extends TestCase {
 	}
 
 	public void testRemove() throws Exception {
-		MethodInspector mi = new XMLMethodInspector(XML_TEST_PATH + "XMLMethodInspectorTest-notRemove.xml");
+		MethodInspector mi = new XMLMethodInspector(XML_TEST_PATH + "XMLMethodInspectorTest-notRemove.xml", this.getRepository());
 		
 		//test if "dummy.Teacher.getJob()Ljava/lang/String;" method is for remove ?
 		Method m= new Method("dummy.Teacher", "getJob", "()Ljava/lang/String;", false);
@@ -83,6 +84,12 @@ public class XMLMethodInspectorTest extends TestCase {
 		//test if "org.w3c.dom.Document.getDoctype()Lorg/w3c/dom/DocumentType;" method is for remove ?
 		m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;", false);
 		assertFalse("Not to remove: " + m.toString(), mi.remove(m.toMethodGen()));
+	}
+	
+	private Repository getRepository() throws Exception {
+		URL[] program = new URL[]{new URL("file:target/test-classes/")};
+		URL[] runtime = new URL[]{};
+		return new URLRepository(program, runtime);
 	}
 
 }

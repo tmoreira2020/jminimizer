@@ -23,7 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-;
+
 ;
 
 /**
@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 public class XMLMethodInspector implements MethodInspector {
 
 	private static final Log log = LogFactory.getLog(XMLMethodInspector.class);
+	protected Repository repository;
 	protected RE reNotInspect;
 	protected RE reNotRemove;
 	protected Set methodsNoRemove;
@@ -43,9 +44,10 @@ public class XMLMethodInspector implements MethodInspector {
 	/**
 	 *  
 	 */
-	public XMLMethodInspector(String file) throws Exception {
+	public XMLMethodInspector(String file, Repository repository) throws Exception {
 		super();
 		this.initPrimitives();
+		this.repository= repository;
 		DocumentBuilder builder =
 			DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document document = builder.parse(file);
@@ -60,13 +62,13 @@ public class XMLMethodInspector implements MethodInspector {
 
 	private void initPrimitives() {
 		primitives = new HashMap();
-		primitives.put("byte", Byte.TYPE);
-		primitives.put("short", Short.TYPE);
-		primitives.put("char", Character.TYPE);
-		primitives.put("int", Integer.TYPE);
-		primitives.put("float", Float.TYPE);
-		primitives.put("long", Long.TYPE);
-		primitives.put("double", Double.TYPE);
+		primitives.put("byte", Byte.TYPE.getName());
+		primitives.put("short", Short.TYPE.getName());
+		primitives.put("char", Character.TYPE.getName());
+		primitives.put("int", Integer.TYPE.getName());
+		primitives.put("float", Float.TYPE.getName());
+		primitives.put("long", Long.TYPE.getName());
+		primitives.put("double", Double.TYPE.getName());
 	}
 
 	private RE buildPattern(Element root, String elementName)
@@ -93,10 +95,12 @@ public class XMLMethodInspector implements MethodInspector {
 				this.buildClass(classElement);
 			Method[] ms = clazz.getMethods();
 			int m = ms.length;
+			System.out.println(clazz);
 			if (m == 0) {
 				buffer.append("\\b");
 				buffer.append(ClassUtils.normalize(clazz.getName()));
 				buffer.append("*");
+				System.out.println(buffer);
 			} else {
 				for (int j = 0; j < m; j++) {
 					buffer.append("\\b");
@@ -126,27 +130,27 @@ public class XMLMethodInspector implements MethodInspector {
 		return buffer.toString();
 	}
 
-	private Method buildConstructor(Class clazz, Element constructorElement)
+	private Method buildConstructor(String className, Element constructorElement)
 		throws ClassNotFoundException {
-		Class[] args =
+		String[] args =
 			this.getArgumentClasses(
 				constructorElement.getFirstChild().getChildNodes());
-		Constructor m = new Constructor(clazz, args);
+		Constructor m = new Constructor(className, args);
 		log.debug("Constructor builded: " + m);
 		return m;
 	}
 
-	private Method buidMethod(Class clazz, Element methodElement)
+	private Method buidMethod(String className, Element methodElement)
 		throws ClassNotFoundException {
 		Node argumentsElement = methodElement.getFirstChild();
 		Element returnElement =
 			(Element) argumentsElement.getNextSibling().getFirstChild();
-		Class[] args =
+		String[] args =
 			this.getArgumentClasses(argumentsElement.getChildNodes());
-		Class ret = this.getReturnClass(returnElement);
+		String ret = this.getReturnClass(returnElement);
 		Method m =
 			new Method(
-				clazz,
+				className,
 				methodElement.getAttribute("name"),
 				args,
 				ret,
@@ -158,37 +162,35 @@ public class XMLMethodInspector implements MethodInspector {
 		return m;
 	}
 
-	private Class[] getArgumentClasses(NodeList list)
+	private String[] getArgumentClasses(NodeList list)
 		throws ClassNotFoundException {
 		return this.getClasses(list);
 	}
 
-	private Class[] getClasses(NodeList list) throws ClassNotFoundException {
-		Class[] classes = new Class[list.getLength()];
+	private String[] getClasses(NodeList list) throws ClassNotFoundException {
+	    String[] classes = new String[list.getLength()];
 		for (int i = 0; i < list.getLength(); i++) {
 			Element element = (Element) list.item(i);
 			String name = element.getNodeName();
 			if (name.equals("primitiveType")) {
-				classes[i] =
-					(java.lang.Class) primitives.get(
+				classes[i] = (String) primitives.get(
 						element.getAttribute("name"));
 			} else {
-				classes[i] = Class.forName(element.getAttribute("name"));
+				classes[i] = element.getAttribute("name");
 			}
 		}
 		return classes;
 	}
 
-	private java.lang.Class getReturnClass(Element element)
+	private String getReturnClass(Element element)
 		throws ClassNotFoundException {
 		String name = element.getNodeName();
 		if (name.equals("void")) {
-			return Void.TYPE;
+			return Void.TYPE.getName();
 		} else if (name.equals("primitiveType")) {
-			return (java.lang.Class) primitives.get(
-				element.getAttribute("name"));
+			return (String)primitives.get(element.getAttribute("name"));
 		} else {
-			return Class.forName(element.getAttribute("name"));
+			return element.getAttribute("name");
 		}
 	}
 
@@ -251,14 +253,14 @@ public class XMLMethodInspector implements MethodInspector {
 		for (int j = 0; j < n; j++) {
 			clazz.add(
 				this.buildConstructor(
-					clazz.toClass(),
+					clazz.getName(),
 					(Element) constructorList.item(j)));
 		}
 		NodeList methodList = element.getElementsByTagName("method");
 		n = methodList.getLength();
 		for (int j = 0; j < n; j++) {
 			clazz.add(
-				this.buidMethod(clazz.toClass(), (Element) methodList.item(j)));
+				this.buidMethod(clazz.getName(), (Element) methodList.item(j)));
 		}
 		return clazz;
 	}
