@@ -87,7 +87,6 @@ public class XMLMethodInspector implements MethodInspector {
         }
 
         log.debug("Pattern compiled: " + pattern);
-        System.out.println(pattern);
         return new RE(pattern);
     }
 
@@ -101,12 +100,10 @@ public class XMLMethodInspector implements MethodInspector {
                     .buildClass(classElement);
             Method[] ms = clazz.getMethods();
             int m = ms.length;
-            System.out.println(clazz);
             if (m == 0) {
                 buffer.append("\\b");
                 buffer.append(ClassUtils.normalize(clazz.getName()));
                 buffer.append("*");
-                System.out.println(buffer);
             } else {
                 for (int j = 0; j < m; j++) {
                     buffer.append("\\b");
@@ -139,7 +136,6 @@ public class XMLMethodInspector implements MethodInspector {
                 buffer.append('|');
             }
         }
-        System.out.println(buffer);
         return buffer.toString();
     }
 
