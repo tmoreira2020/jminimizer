@@ -12,7 +12,7 @@ A integração com um obfuscador traria além de dificultar a engenharia reversa, u
 Atualmente uma grande quantidade de aplicativos possuem integração ao Maven, e essa integração é feita através de plugins. Uma versão beta desse plugin para o JMinimizer já esta em testes no entanto a falta de tempo paralizou seu desenvoilvimento.
 
 \section{Ampliar as formas de declarar métodos \textit{entry point}}
-Nos primeiros testes com aplicações reais surgiu a necessidade de declarar métodos que devem ser analisados de uma forma diferente da que a usual, por exemplo por pacotes. Essa melhoria traria diminuição na configuração do JMinimizer.
+Nos primeiros testes com aplicações reais surgiu a necessidade de declarar métodos que devem ser analisados de uma forma diferente da que a usual, por exemplo por pacotes. Essa melhoria traria diminuição no tempo de configuração do JMinimizer.
 
 \section{Compatibilização com o J2SE 5.0}
 Recentemente foi lançado a versão 5.0 da plataforma J2SE\footnote{Java 2 Standart Edition}, que traz entre outras coisas o recurso de Anotações, que possibilita o desenvolvedor marcar métodos e campos para que outras ferramentas possam identifica-los e processa-los facilmente. No entanto esse novo recurso de Java impactou na modificação da estrutura do bytecode, portanto a atual versão do JMinimizer e também BCEL é imcompatível com esta versão da plataforma. Assim que BCEL for compatível com a nova plataforma será iniciado um esforço para, também, compatibilizar o JMinimizer a plataforma 5.0 do J2SE. Como foi adquirido grande conhecimento da biblioteca BCEL, tanto nas ferramentas como até mesmo no código fonte, me disponibilizei para ajudar na compatibilização do BCEL ao Java 5.0.
