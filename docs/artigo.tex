@@ -30,13 +30,13 @@ Uma analise estática do código já compilado da aplicação, poderá nos fornecer as
 Implementação da idéia
 
 Um programa Java pode ter dois tipos de dependência relacionados a bibliotecas e frameworks de terceiros. 
-O primerio tipo de dependência está vinculado ao ambiente em que a aplicação depois de pronta será executado, e nesse artigo a identificamos como dependência do tipo \i{runtime}. Suponhamos que estamos desenvolvendo um aplicativo para dispositivos móveis com suporte a Wireless Message API. Estes dispositivos possuem implementações das classes do pacote javax.wireless.messaging, sendo assim estas classes já estam disponiveis no ambiente de execução, no entanto para a compilação e para a analise estática do código elas são desconhecidas. Para a analise estática é preciso referencia-la, para que quando o JMinimizer começar a analiser a aplicação ele encontre todas as classes e interfaces que são referêncidas no código.
-O outro tipo de dependência não está relacionado ao ambiente de execução, no entanto também deve estar presente neste. Esse tipo de dependêcia é criada pelo desenvolvedor quando para solucionar problemas de infra estrutura tipo parsers XML, logging, persistência, este utiliza bibliotecas e/ou frameworks para resolve-los. Como esta dependência não está disponível no ambiente de execução ela deve ser disponibilizada juntamente com a aplicação. Aqui neste artigo a identificamos como dependência do tipo \i{program}.
-Dito isto já entedemos que as dependências do tipo \i{runtime} não precisam de nenhum tipo de tratamento, já que elas fazem parte do ambiente de execução. Já as dependências do tipo \i{program} podem e devem ser modificadas para diminuir o tamanho final da aplicação, já que elas devem ser disponibilizadas juntamento com o software.
+O primerio tipo de dependência está vinculado ao ambiente em que a aplicação depois de pronta será executado, e nesse artigo a identificamos como dependência do tipo \textit{runtime}. Suponhamos que estamos desenvolvendo um aplicativo para dispositivos móveis com suporte a Wireless Message API. Estes dispositivos possuem implementações das classes do pacote javax.wireless.messaging, sendo assim estas classes já estam disponiveis no ambiente de execução, no entanto para a compilação e para a analise estática do código elas são desconhecidas. Para a analise estática é preciso referencia-la, para que quando o JMinimizer começar a analiser a aplicação ele encontre todas as classes e interfaces que são referêncidas no código.
+O outro tipo de dependência não está relacionado ao ambiente de execução, no entanto também deve estar presente neste. Esse tipo de dependêcia é criada pelo desenvolvedor quando para solucionar problemas de infra estrutura tipo parsers XML, logging, persistência, este utiliza bibliotecas e/ou frameworks para resolve-los. Como esta dependência não está disponível no ambiente de execução ela deve ser disponibilizada juntamente com a aplicação. Aqui neste artigo a identificamos como dependência do tipo \textit{program}.
+Dito isto já entedemos que as dependências do tipo \textit{runtime} não precisam de nenhum tipo de tratamento, já que elas fazem parte do ambiente de execução. Já as dependências do tipo \textit{program} podem e devem ser modificadas para diminuir o tamanho final da aplicação, já que elas devem ser disponibilizadas juntamento com o software.
 
-O arquivo de configuração do JMinimizer possue secções para a devida declaração de quais bibliotecas fazem parte da dependência do tipo \i{runtime} e do tipo \i{program}. 
+O arquivo de configuração do JMinimizer possue secções para a devida declaração de quais bibliotecas fazem parte da dependência do tipo \textit{runtime} e do tipo \textit{program}. 
 
-Exemplo de dependêcia do tipo \i{program}.
+Exemplo de dependêcia do tipo \textit{program}.
 	 <programClasspath>
                 <directory path="./target/classes"/>
                 <fileset directory="./lib">
@@ -50,7 +50,7 @@ Exemplo de dependêcia do tipo \i{program}.
                 </fileset>
         </programClasspath>
 
-Também no arquivo de configuração é necessário declarar o \i{entry point} da aplicação. Geralmente o \i{entry point} é o método main, startApp (para Midlets) ou start (para Applets). Além do método \i{entry point} também é necessário declarar os métodos que serão chamados pelo ambiente de execução. Exemplo disto são os métodos startApp, pauseApp e destroyApp de um Midlet.
+Também no arquivo de configuração é necessário declarar o \textit{entry point} da aplicação. Geralmente o \textit{entry point} é o método main, startApp (para Midlets) ou start (para Applets). Além do método \textit{entry point} também é necessário declarar os métodos que serão chamados pelo ambiente de execução. Exemplo disto são os métodos startApp, pauseApp e destroyApp de um Midlet.
 
 	<class name="net.java.dev.jminimizer.Midlet">
                 <method name="startApp">
