@@ -27,7 +27,17 @@ public abstract class FieldOrMethod {
 
     protected String signature;
 
-    /**
+	/**
+	 * 
+	 */
+	public FieldOrMethod(String className, String name, String signature) {
+		super();
+		this.setClassName(className);
+		this.setName(name);
+		this.setSignature(signature);
+	}
+
+	/**
      *  
      */
     protected FieldOrMethod() {

@@ -8,18 +8,9 @@ import org.apache.bcel.generic.Type;
  */
 public class Field extends FieldOrMethod {
 
-	/**
-	 * 
-	 */
-	public Field(String className, String name, String signature) {
-		super();
-		this.setClassName(className);
-		this.setName(name);
-		this.setSignature(signature);
-	}
 	
 	public Field(java.lang.reflect.Field field) {
-	    this(field.getDeclaringClass().getName(), field.getName(), Type.getType(field.getType()).getSignature());
+	    super(field.getDeclaringClass().getName(), field.getName(), Type.getType(field.getType()).getSignature());
 	}
 
 	/**
@@ -34,5 +25,13 @@ public class Field extends FieldOrMethod {
 		buffer.append('.');
 		buffer.append(this.getName());
 		return buffer.toString();
+	}
+	/**
+	 * @param className
+	 * @param name
+	 * @param signature
+	 */
+	public Field(String className, String name, String signature) {
+		super(className, name, signature);
 	}
 }
