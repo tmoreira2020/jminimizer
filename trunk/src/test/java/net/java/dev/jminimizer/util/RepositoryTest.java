@@ -60,11 +60,6 @@ public class RepositoryTest extends TestCase {
         assertNull(repo.findClass("util.Data"));
     }
 
-    public void testGetClassPath() throws Exception{
-        Repository repo= this.getRepository();
-        assertNull(repo.getClassPath());
-    }
-
     public void testGetProgramClasses() throws Exception {
         Repository repo= this.getRepository();
         Set classes= repo.getProgramClasses();

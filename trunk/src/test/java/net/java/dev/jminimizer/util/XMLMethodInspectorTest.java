@@ -19,7 +19,7 @@ public class XMLMethodInspectorTest extends TestCase {
 	public static final String XML_TEST_PATH = AllTests.TEST_PATH + "xml" + File.separator;
 
 	public void testGetMethodsToInspect() throws Exception{
-		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH,"XMLMethodInspectorTest-inspect.xml"), this.getRepository());
+		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH,"XMLMethodInspectorTest-inspect.xml"));
 		Method[] ms = mi.getMethodsToInspect();
 		//check if amount of method/constructor is three
 		assertEquals(3, ms.length);
@@ -39,7 +39,7 @@ public class XMLMethodInspectorTest extends TestCase {
 	}
 	
 	public void testInspect() throws Exception{
-		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notInspect.xml"), this.getRepository());
+		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notInspect.xml"));
 		
 		//test if "org.w3c.dom.Document.getDoctype()Lorg/w3c/dom/DocumentType;" method is for inspect ?
 		Method m= new Method("org.w3c.dom.Document", "getDoctype", "()Lorg/w3c/dom/DocumentType;");
@@ -56,7 +56,7 @@ public class XMLMethodInspectorTest extends TestCase {
 	}
 
 	public void testRemove() throws Exception {
-		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notRemove.xml"), this.getRepository());
+		Configurator mi = new XMLConfigurator(new File(XML_TEST_PATH, "XMLMethodInspectorTest-notRemove.xml"));
 		
 		//test if "dummy.Teacher.getJob()Ljava/lang/String;" method is for remove ?
 		Method m= new Method("dummy.Teacher", "getJob", "()Ljava/lang/String;");
@@ -83,10 +83,4 @@ public class XMLMethodInspectorTest extends TestCase {
 		//assertFalse("Not to remove: " + m.toString(), mi.remove(m));
 	}
 	
-	private Repository getRepository() throws Exception {
-		URL[] program = new URL[]{new URL("file:target/test-classes/")};
-		URL[] runtime = new URL[]{};
-		return new URLRepository(program, runtime);
-	}
-
 }
