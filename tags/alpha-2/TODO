@@ -1,0 +1,3 @@
+
+	-eliminar os atributos que não são utilizados (métodos que foram removidos e que agora não utilizão mais os atributos).
+	-eliminar os métodos que forão excluidos das interfaces e que agora existem classes que os contêm no entanto eles ja não existem mais nas interfaces.

@@ -1,0 +1,3 @@
+        <notInspect>
+                <pattern>java.io*</pattern>
+        </notInspect>
